@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "sourceMap": true,
+    "module": "esnext",
+    "target": "es5",
+    "jsx": "react",
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true
+  },
+  "include": [
+    "lib/**/*.ts",
+    "demo/**/*.tsx",
+    "demo/**/*.ts"
+  ]
+}

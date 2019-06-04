@@ -1,0 +1,10 @@
+.idea
+.DS_Store
+node_modules
+*.log
+dist
+pkg
+bin
+
+/target
+**/*.rs.bk

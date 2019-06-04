@@ -1,0 +1,19 @@
+[package]
+name = "gl-matrix-wasm"
+version = "0.1.0"
+authors = ["dtysky <dtysky@outlook.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies.wasm-bindgen]
+version = "0.2.45"
+features = [
+  "nightly"
+]
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"
+lto = true
