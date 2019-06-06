@@ -12,4 +12,7 @@
 // pub mod matrix4;
 // pub mod enums;
 
+pub mod common;
 pub mod vector3;
+pub mod matrix4;
+pub mod matrix2;

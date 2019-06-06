@@ -5,6 +5,8 @@ node_modules
 dist
 pkg
 bin
+.vscode
+trans/rust
 
 /target
 **/*.rs.bk
