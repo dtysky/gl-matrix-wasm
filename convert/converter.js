@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * @File   : trans.js
+ * @File   : converter.js
  * @Author : dtysky (dtysky@outlook.com)
  * @Date   : 6/6/2019, 5:21:14 PM
  * @Description:

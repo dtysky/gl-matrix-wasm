@@ -6,7 +6,7 @@ dist
 pkg
 bin
 .vscode
-trans/rust
+convert/rust
 
 /target
 **/*.rs.bk
