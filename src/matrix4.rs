@@ -1,436 +1,1740 @@
-/**
- * @File   : matrix4.rs
- * @Author : dtysky (dtysky@outlook.com)
- * @Date   : 6/6/2019, 10:46:14 AM
- * @Description:
- */
 use wasm_bindgen::prelude::*;
-
-// use super::euler::*;
-// use super::enums::*;
-// use super::quaternion::*;
-// use super::vector3::*;
-
-fn clamp_f32(num: f32, min: f32, max: f32) -> f32 {
-  if num < min {
-    min
-  } else if num > max {
-    max
-  } else {
-    num
-  }
-}
+  
+use super::common::*;
 
 #[wasm_bindgen]
 pub struct Matrix4(
   pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32,
-  pub f32
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32
 );
 
 #[wasm_bindgen]
-impl Matrix4 {
-  pub fn create() -> Matrix4 {
-    Matrix4(
-      1., 0., 0., 0.,
-      0., 1., 0., 0.,
-      0., 0., 1., 0.,
-      0., 0., 0., 1.
-    )
+impl Matrix2 {
+  #[wasm_bindgen(getter)]
+  pub fn elements(&self) -> Box<[f32]> {
+    Box::new([
+      self.0,
+self.1,
+self.2,
+self.3,
+self.4,
+self.5,
+self.6,
+self.7,
+self.8,
+self.9,
+self.10,
+self.11,
+self.12,
+self.13,
+self.14,
+self.15
+    ])
   }
 
-  #[wasm_bindgen(js_name="fromValues")]
-  pub fn from_values(
-    m11: f32,
-    m12: f32,
-    m13: f32,
-    m14: f32,
-    m21: f32,
-    m22: f32,
-    m23: f32,
-    m24: f32,
-    m31: f32,
-    m32: f32,
-    m33: f32,
-    m34: f32,
-    m41: f32,
-    m42: f32,
-    m43: f32,
-    m44: f32,
-  ) -> Matrix4 {
-    Matrix4(
-      m11, m12, m13, m14,
-      m21, m22, m23, m24,
-      m31, m32, m33, m34,
-      m41, m42, m43, m44
-    )
+
+/**
+ * 4x4 Matrix<br>Format: column-major, when typed out it looks like row-major<br>The matrices are being post multiplied.
+ * @module mat4
+ */
+
+/**
+ * Creates a new identity mat4
+ *
+ * @returns {mat4} a new 4x4 matrix
+ */
+pub fn create()  -> Matrix4 {
+  Matrix4(1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.)
+}
+
+/**
+ * Creates a new mat4 initialized with values from an existing matrix
+ *
+ * @param {mat4} a matrix to clone
+ * @returns {mat4} a new 4x4 matrix
+ */
+pub fn clone(a: &Matrix4)  -> Matrix4 {
+  Matrix4(a.0, a.1, a.2, a.3, a.4, a.5, a.6, a.7, a.8, a.9, a.10, a.11, a.12, a.13, a.14, a.15)
+}
+
+/**
+ * Copy the values from one mat4 to another
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the source matrix
+ * @returns {mat4} out
+ */
+pub fn copy(out: &mut Matrix4, a: &Matrix4) {
+  out.0 = a.0;
+  out.1 = a.1;
+  out.2 = a.2;
+  out.3 = a.3;
+  out.4 = a.4;
+  out.5 = a.5;
+  out.6 = a.6;
+  out.7 = a.7;
+  out.8 = a.8;
+  out.9 = a.9;
+  out.10 = a.10;
+  out.11 = a.11;
+  out.12 = a.12;
+  out.13 = a.13;
+  out.14 = a.14;
+  out.15 = a.15;
   }
 
-  pub fn multiply(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
-    let a00 = a.0;
-    let a01 = a.1;
-    let a02 = a.2;
-    let a03 = a.3;
-    let a10 = a.4;
-    let a11 = a.5;
-    let a12 = a.6;
-    let a13 = a.7;
-    let a20 = a.8;
-    let a21 = a.9;
-    let a22 = a.10;
+/**
+ * Create a new mat4 with the given values
+ *
+ * @param {Number} m00 Component in column 0, row 0 position (index 0)
+ * @param {Number} m01 Component in column 0, row 1 position (index 1)
+ * @param {Number} m02 Component in column 0, row 2 position (index 2)
+ * @param {Number} m03 Component in column 0, row 3 position (index 3)
+ * @param {Number} m10 Component in column 1, row 0 position (index 4)
+ * @param {Number} m11 Component in column 1, row 1 position (index 5)
+ * @param {Number} m12 Component in column 1, row 2 position (index 6)
+ * @param {Number} m13 Component in column 1, row 3 position (index 7)
+ * @param {Number} m20 Component in column 2, row 0 position (index 8)
+ * @param {Number} m21 Component in column 2, row 1 position (index 9)
+ * @param {Number} m22 Component in column 2, row 2 position (index 10)
+ * @param {Number} m23 Component in column 2, row 3 position (index 11)
+ * @param {Number} m30 Component in column 3, row 0 position (index 12)
+ * @param {Number} m31 Component in column 3, row 1 position (index 13)
+ * @param {Number} m32 Component in column 3, row 2 position (index 14)
+ * @param {Number} m33 Component in column 3, row 3 position (index 15)
+ * @returns {mat4} A new mat4
+ */
+pub fn fromValues(m00: f32, m01: f32, m02: f32, m03: f32, m10: f32, m11: f32, m12: f32, m13: f32, m20: f32, m21: f32, m22: f32, m23: f32, m30: f32, m31: f32, m32: f32, m33: f32)  -> Matrix4 {
+  Matrix4(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33)
+}
+
+/**
+ * Set the components of a mat4 to the given values
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {Number} m00 Component in column 0, row 0 position (index 0)
+ * @param {Number} m01 Component in column 0, row 1 position (index 1)
+ * @param {Number} m02 Component in column 0, row 2 position (index 2)
+ * @param {Number} m03 Component in column 0, row 3 position (index 3)
+ * @param {Number} m10 Component in column 1, row 0 position (index 4)
+ * @param {Number} m11 Component in column 1, row 1 position (index 5)
+ * @param {Number} m12 Component in column 1, row 2 position (index 6)
+ * @param {Number} m13 Component in column 1, row 3 position (index 7)
+ * @param {Number} m20 Component in column 2, row 0 position (index 8)
+ * @param {Number} m21 Component in column 2, row 1 position (index 9)
+ * @param {Number} m22 Component in column 2, row 2 position (index 10)
+ * @param {Number} m23 Component in column 2, row 3 position (index 11)
+ * @param {Number} m30 Component in column 3, row 0 position (index 12)
+ * @param {Number} m31 Component in column 3, row 1 position (index 13)
+ * @param {Number} m32 Component in column 3, row 2 position (index 14)
+ * @param {Number} m33 Component in column 3, row 3 position (index 15)
+ * @returns {mat4} out
+ */
+pub fn set(out: &mut Matrix4, m00: f32, m01: f32, m02: f32, m03: f32, m10: f32, m11: f32, m12: f32, m13: f32, m20: f32, m21: f32, m22: f32, m23: f32, m30: f32, m31: f32, m32: f32, m33: f32) {
+  out.0 = m00;
+  out.1 = m01;
+  out.2 = m02;
+  out.3 = m03;
+  out.4 = m10;
+  out.5 = m11;
+  out.6 = m12;
+  out.7 = m13;
+  out.8 = m20;
+  out.9 = m21;
+  out.10 = m22;
+  out.11 = m23;
+  out.12 = m30;
+  out.13 = m31;
+  out.14 = m32;
+  out.15 = m33;
+  }
+
+
+/**
+ * Set a mat4 to the identity matrix
+ *
+ * @param {mat4} out the receiving matrix
+ * @returns {mat4} out
+ */
+pub fn identity(out: &mut Matrix4) {
+  out.0 = 1;
+  out.1 = 0;
+  out.2 = 0;
+  out.3 = 0;
+  out.4 = 0;
+  out.5 = 1;
+  out.6 = 0;
+  out.7 = 0;
+  out.8 = 0;
+  out.9 = 0;
+  out.10 = 1;
+  out.11 = 0;
+  out.12 = 0;
+  out.13 = 0;
+  out.14 = 0;
+  out.15 = 1;
+  }
+
+/**
+ * Transpose the values of a mat4
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the source matrix
+ * @returns {mat4} out
+ */
+pub fn transpose(out: &mut Matrix4, a: &Matrix4) {
+  // If we are transposing ourselves we can skip a few steps but have to cache some values
+  if (out == a) {
+    let a01=a.1;
+let a02=a.2;
+let a03=a.3;
+    let a12=a.6;
+let a13=a.7;
     let a23 = a.11;
-    let a30 = a.12;
-    let a31 = a.13;
-    let a32 = a.14;
-    let a33 = a.15;
 
-    // Cache only the current line of the second matrix
-    let b0  = b.0;
-    let b1 = b.1;
-    let b2 = b.2;
-    let b3 = b.3;
-    out.0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out.1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out.2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out.3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-
-    let b0 = b.4;
-    let b1 = b.5;
-    let b2 = b.6;
-    let b3 = b.7;
-    out.4 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out.5 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out.6 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out.7 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-
-    let b0 = b.8;
-    let b1 = b.9;
-    let b2 = b.10;
-    let b3 = b.11;
-    out.8 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out.9 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out.10 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out.11 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-
-    let b0 = b.12;
-    let b1 = b.13;
-    let b2 = b.14;
-    let b3 = b.15;
-    out.12 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out.13 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out.14 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out.15 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    out.1 = a.4;
+    out.2 = a.8;
+    out.3 = a.12;
+    out.4 = a01;
+    out.6 = a.9;
+    out.7 = a.13;
+    out.8 = a02;
+    out.9 = a12;
+    out.11 = a.14;
+    out.12 = a03;
+    out.13 = a13;
+    out.14 = a23;
+  } else {
+    out.0 = a.0;
+    out.1 = a.4;
+    out.2 = a.8;
+    out.3 = a.12;
+    out.4 = a.1;
+    out.5 = a.5;
+    out.6 = a.9;
+    out.7 = a.13;
+    out.8 = a.2;
+    out.9 = a.6;
+    out.10 = a.10;
+    out.11 = a.14;
+    out.12 = a.3;
+    out.13 = a.7;
+    out.14 = a.11;
+    out.15 = a.15;
   }
 
-  // #[wasm_bindgen(method, js_name = "fromTRS")]
-  // pub fn from_trs(&mut self, transition: &Vector3, quat: &Quaternion, scale: &Vector3) {
-  //   // Quaternion math
-  //   let x = quat.x();
-  //   let y = quat.y();
-  //   let z = quat.z();
-  //   let w = quat.w();
-  //   let x2 = x + x;
-  //   let y2 = y + y;
-  //   let z2 = z + z;
+  }
 
-  //   let xx = x * x2;
-  //   let xy = x * y2;
-  //   let xz = x * z2;
-  //   let yy = y * y2;
-  //   let yz = y * z2;
-  //   let zz = z * z2;
-  //   let wx = w * x2;
-  //   let wy = w * y2;
-  //   let wz = w * z2;
-  //   let sx = scale.x();
-  //   let sy = scale.y();
-  //   let sz = scale.z();
+/**
+ * Inverts a mat4
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the source matrix
+ * @returns {mat4} out
+ */
+pub fn invert(out: &mut Matrix4, a: &Matrix4) {
+  let a00=a.0;
+let a01=a.1;
+let a02=a.2;
+let a03=a.3;
+  let a10=a.4;
+let a11=a.5;
+let a12=a.6;
+let a13=a.7;
+  let a20=a.8;
+let a21=a.9;
+let a22=a.10;
+let a23=a.11;
+  let a30=a.12;
+let a31=a.13;
+let a32=a.14;
+let a33=a.15;
 
-  //   self.0 = (1. - (yy + zz)) * sx;
-  //   self.1 = (xy + wz) * sx;
-  //   self.2 = (xz - wy) * sx;
-  //   self.3 = 0.;
-  //   self.4 = (xy - wz) * sy;
-  //   self.5 = (1. - (xx + zz)) * sy;
-  //   self.6 = (yz + wx) * sy;
-  //   self.7 = 0.;
-  //   self.8 = (xz + wy) * sz;
-  //   self.9 = (yz - wx) * sz;
-  //   self.10 = (1. - (xx + yy)) * sz;
-  //   self.11 = 0.;
-  //   self.12 = transition.x();
-  //   self.13 = transition.y();
-  //   self.14 = transition.z();
-  //   self.15 = 1.;
-  // }
+  let b00 = a00 * a11 - a01 * a10;
+  let b01 = a00 * a12 - a02 * a10;
+  let b02 = a00 * a13 - a03 * a10;
+  let b03 = a01 * a12 - a02 * a11;
+  let b04 = a01 * a13 - a03 * a11;
+  let b05 = a02 * a13 - a03 * a12;
+  let b06 = a20 * a31 - a21 * a30;
+  let b07 = a20 * a32 - a22 * a30;
+  let b08 = a20 * a33 - a23 * a30;
+  let b09 = a21 * a32 - a22 * a31;
+  let b10 = a21 * a33 - a23 * a31;
+  let b11 = a22 * a33 - a23 * a32;
 
-  // #[wasm_bindgen(method, js_name = "fromQuat")]
-  // pub fn from_quat(&mut self, quat: &Quaternion) {
-  //   let x = quat.x();
-  //   let y = quat.y();
-  //   let z = quat.z();
-  //   let w = quat.w();
-  //   let x2 = x + x;
-  //   let y2 = y + y;
-  //   let z2 = z + z;
+  // Calculate the determinant
+  let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
-  //   let xx = x * x2;
-  //   let yx = y * x2;
-  //   let yy = y * y2;
-  //   let zx = z * x2;
-  //   let zy = z * y2;
-  //   let zz = z * z2;
-  //   let wx = w * x2;
-  //   let wy = w * y2;
-  //   let wz = w * z2;
+  if (!det) {
+    return null;
+  }
+  det = 1.0 / det;
 
-  //   self.0 = 1. - yy - zz;
-  //   self.1 = yx + wz;
-  //   self.2 = zx - wy;
-  //   self.3 = 0.;
+  out.0 = (a11 * b11 - a12 * b10 + a13 * b09) * det;
+  out.1 = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+  out.2 = (a31 * b05 - a32 * b04 + a33 * b03) * det;
+  out.3 = (a22 * b04 - a21 * b05 - a23 * b03) * det;
+  out.4 = (a12 * b08 - a10 * b11 - a13 * b07) * det;
+  out.5 = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+  out.6 = (a32 * b02 - a30 * b05 - a33 * b01) * det;
+  out.7 = (a20 * b05 - a22 * b02 + a23 * b01) * det;
+  out.8 = (a10 * b10 - a11 * b08 + a13 * b06) * det;
+  out.9 = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+  out.10 = (a30 * b04 - a31 * b02 + a33 * b00) * det;
+  out.11 = (a21 * b02 - a20 * b04 - a23 * b00) * det;
+  out.12 = (a11 * b07 - a10 * b09 - a12 * b06) * det;
+  out.13 = (a00 * b09 - a01 * b07 + a02 * b06) * det;
+  out.14 = (a31 * b01 - a30 * b03 - a32 * b00) * det;
+  out.15 = (a20 * b03 - a21 * b01 + a22 * b00) * det;
 
-  //   self.4 = yx - wz;
-  //   self.5 = 1. - xx - zz;
-  //   self.6 = zy + wx;
-  //   self.7 = 0.;
+  }
 
-  //   self.8 = zx + wy;
-  //   self.9 = zy - wx;
-  //   self.10 = 1. - xx - yy;
-  //   self.11 = 0.;
+/**
+ * Calculates the adjugate of a mat4
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the source matrix
+ * @returns {mat4} out
+ */
+pub fn adjoint(out: &mut Matrix4, a: &Matrix4) {
+  let a00=a.0;
+let a01=a.1;
+let a02=a.2;
+let a03=a.3;
+  let a10=a.4;
+let a11=a.5;
+let a12=a.6;
+let a13=a.7;
+  let a20=a.8;
+let a21=a.9;
+let a22=a.10;
+let a23=a.11;
+  let a30=a.12;
+let a31=a.13;
+let a32=a.14;
+let a33=a.15;
 
-  //   self.12 = 0.;
-  //   self.13 = 0.;
-  //   self.14 = 0.;
-  //   self.15 = 1.;
-  // }
+  out.0  =  (a11 * (a22 * a33 - a23 * a32) - a21 * (a12 * a33 - a13 * a32) + a31 * (a12 * a23 - a13 * a22));
+  out.1  = -(a01 * (a22 * a33 - a23 * a32) - a21 * (a02 * a33 - a03 * a32) + a31 * (a02 * a23 - a03 * a22));
+  out.2  =  (a01 * (a12 * a33 - a13 * a32) - a11 * (a02 * a33 - a03 * a32) + a31 * (a02 * a13 - a03 * a12));
+  out.3  = -(a01 * (a12 * a23 - a13 * a22) - a11 * (a02 * a23 - a03 * a22) + a21 * (a02 * a13 - a03 * a12));
+  out.4  = -(a10 * (a22 * a33 - a23 * a32) - a20 * (a12 * a33 - a13 * a32) + a30 * (a12 * a23 - a13 * a22));
+  out.5  =  (a00 * (a22 * a33 - a23 * a32) - a20 * (a02 * a33 - a03 * a32) + a30 * (a02 * a23 - a03 * a22));
+  out.6  = -(a00 * (a12 * a33 - a13 * a32) - a10 * (a02 * a33 - a03 * a32) + a30 * (a02 * a13 - a03 * a12));
+  out.7  =  (a00 * (a12 * a23 - a13 * a22) - a10 * (a02 * a23 - a03 * a22) + a20 * (a02 * a13 - a03 * a12));
+  out.8  =  (a10 * (a21 * a33 - a23 * a31) - a20 * (a11 * a33 - a13 * a31) + a30 * (a11 * a23 - a13 * a21));
+  out.9  = -(a00 * (a21 * a33 - a23 * a31) - a20 * (a01 * a33 - a03 * a31) + a30 * (a01 * a23 - a03 * a21));
+  out.10 =  (a00 * (a11 * a33 - a13 * a31) - a10 * (a01 * a33 - a03 * a31) + a30 * (a01 * a13 - a03 * a11));
+  out.11 = -(a00 * (a11 * a23 - a13 * a21) - a10 * (a01 * a23 - a03 * a21) + a20 * (a01 * a13 - a03 * a11));
+  out.12 = -(a10 * (a21 * a32 - a22 * a31) - a20 * (a11 * a32 - a12 * a31) + a30 * (a11 * a22 - a12 * a21));
+  out.13 =  (a00 * (a21 * a32 - a22 * a31) - a20 * (a01 * a32 - a02 * a31) + a30 * (a01 * a22 - a02 * a21));
+  out.14 = -(a00 * (a11 * a32 - a12 * a31) - a10 * (a01 * a32 - a02 * a31) + a30 * (a01 * a12 - a02 * a11));
+  out.15 =  (a00 * (a11 * a22 - a12 * a21) - a10 * (a01 * a22 - a02 * a21) + a20 * (a01 * a12 - a02 * a11));
+  }
 
-  // #[wasm_bindgen(method, js_name = "fromPerspective")]
-  // pub fn from_perspective(&mut self, fov: f32, aspect: f32, near: f32, far: f32) {
-  //   let f = 1.0 / f32::tan(fov / 2.);
-  //   let nf = 1. / (near - far);
-  //   self.0 = f / aspect;
-  //   self.1 = 0.;
-  //   self.2 = 0.;
-  //   self.3 = 0.;
-  //   self.4 = 0.;
-  //   self.5 = f;
-  //   self.6 = 0.;
-  //   self.7 = 0.;
-  //   self.8 = 0.;
-  //   self.9 = 0.;
-  //   self.10 = (far + near) * nf;
-  //   self.11 = -1.;
-  //   self.12 = 0.;
-  //   self.13 = 0.;
-  //   self.14 = (2. * far * near) * nf;
-  //   self.15 = 0.;
-  // }
+/**
+ * Calculates the determinant of a mat4
+ *
+ * @param {mat4} a the source matrix
+ * @returns {Number} determinant of a
+ */
+pub fn determinant(a: &Matrix4) {
+  let a00=a.0;
+let a01=a.1;
+let a02=a.2;
+let a03=a.3;
+  let a10=a.4;
+let a11=a.5;
+let a12=a.6;
+let a13=a.7;
+  let a20=a.8;
+let a21=a.9;
+let a22=a.10;
+let a23=a.11;
+  let a30=a.12;
+let a31=a.13;
+let a32=a.14;
+let a33=a.15;
 
-  // #[wasm_bindgen(method, js_name = "buildViewMatrix")]
-  // pub fn build_view_matrix(&mut self, model_matrix: &mut Matrix4) {
-  //   let t = &mut Vector3::zero();
-  //   model_matrix.get_transition(t);
-  //   model_matrix.get_transpose_matrix(self);
-  //   let rx = &mut Vector3::new(self.0, self.1, self.2);
-  //   let ry = &mut Vector3::new(self.4, self.5, self.6);
-  //   let rz = &mut Vector3::new(self.8, self.9, self.10);
+  let b00 = a00 * a11 - a01 * a10;
+  let b01 = a00 * a12 - a02 * a10;
+  let b02 = a00 * a13 - a03 * a10;
+  let b03 = a01 * a12 - a02 * a11;
+  let b04 = a01 * a13 - a03 * a11;
+  let b05 = a02 * a13 - a03 * a12;
+  let b06 = a20 * a31 - a21 * a30;
+  let b07 = a20 * a32 - a22 * a30;
+  let b08 = a20 * a33 - a23 * a30;
+  let b09 = a21 * a32 - a22 * a31;
+  let b10 = a21 * a33 - a23 * a31;
+  let b11 = a22 * a33 - a23 * a32;
 
-  //   self.12 = -rx.dot(t);
-  //   self.13 = -ry.dot(t);
-  //   self.14 = -rz.dot(t);
-  //   self.3 = 0.;
-  //   self.7 = 0.;
-  //   self.11 = 0.;
-  //   self.15 = 1.;
-  // }
+  // Calculate the determinant
+  return b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+}
 
-  // #[wasm_bindgen(method, js_name = "transpose")]
-  // pub fn get_transpose_matrix(&mut self, matrix: &mut Matrix4) {
-  //   let a01 = self.1;
-  //   let a02 = self.2;
-  //   let a03 = self.3;
-  //   let a12 = self.6;
-  //   let a13 = self.7;
-  //   let a23 = self.11;
+/**
+ * Multiplies two mat4s
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the first operand
+ * @param {mat4} b the second operand
+ * @returns {mat4} out
+ */
+pub fn multiply(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
+  let a00=a.0;
+let a01=a.1;
+let a02=a.2;
+let a03=a.3;
+  let a10=a.4;
+let a11=a.5;
+let a12=a.6;
+let a13=a.7;
+  let a20=a.8;
+let a21=a.9;
+let a22=a.10;
+let a23=a.11;
+  let a30=a.12;
+let a31=a.13;
+let a32=a.14;
+let a33=a.15;
 
-  //   matrix.1 = self.4;
-  //   matrix.2 = self.8;
-  //   matrix.3 = self.12;
-  //   matrix.4 = a01;
-  //   matrix.6 = self.9;
-  //   matrix.7 = self.13;
-  //   matrix.8 = a02;
-  //   matrix.9 = a12;
-  //   matrix.11 = self.14;
-  //   matrix.12 = a03;
-  //   matrix.13 = a13;
-  //   matrix.14 = a23;
-  // }
+  // Cache only the current line of the second matrix
+  let b0  = b.0, b1 = b.1, b2 = b.2, b3 = b.3;
+  out.0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+  out.1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+  out.2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+  out.3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
-  // #[wasm_bindgen(method, js_name = "getInverseMatrix")]
-  // pub fn get_inverse_matrix(&mut self, matrix: &mut Matrix4) {
-  //   let a00 = self.0;
-  //   let a01 = self.1;
-  //   let a02 = self.2;
-  //   let a03 = self.3;
-  //   let a10 = self.4;
-  //   let a11 = self.5;
-  //   let a12 = self.6;
-  //   let a13 = self.7;
-  //   let a20 = self.8;
-  //   let a21 = self.9;
-  //   let a22 = self.10;
-  //   let a23 = self.11;
-  //   let a30 = self.12;
-  //   let a31 = self.13;
-  //   let a32 = self.14;
-  //   let a33 = self.15;
+  b0 = b.4; b1 = b.5; b2 = b.6; b3 = b.7;
+  out.4 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+  out.5 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+  out.6 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+  out.7 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
-  //   let b00 = a00 * a11 - a01 * a10;
-  //   let b01 = a00 * a12 - a02 * a10;
-  //   let b02 = a00 * a13 - a03 * a10;
-  //   let b03 = a01 * a12 - a02 * a11;
-  //   let b04 = a01 * a13 - a03 * a11;
-  //   let b05 = a02 * a13 - a03 * a12;
-  //   let b06 = a20 * a31 - a21 * a30;
-  //   let b07 = a20 * a32 - a22 * a30;
-  //   let b08 = a20 * a33 - a23 * a30;
-  //   let b09 = a21 * a32 - a22 * a31;
-  //   let b10 = a21 * a33 - a23 * a31;
-  //   let b11 = a22 * a33 - a23 * a32;
+  b0 = b.8; b1 = b.9; b2 = b.10; b3 = b.11;
+  out.8 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+  out.9 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+  out.10 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+  out.11 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
-  //   let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
-  //   let det = 1.0 / det;
+  b0 = b.12; b1 = b.13; b2 = b.14; b3 = b.15;
+  out.12 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+  out.13 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+  out.14 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+  out.15 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+  }
 
-  //   matrix.0 = (a11 * b11 - a12 * b10 + a13 * b09) * det;
-  //   matrix.1 = (a02 * b10 - a01 * b11 - a03 * b09) * det;
-  //   matrix.2 = (a31 * b05 - a32 * b04 + a33 * b03) * det;
-  //   matrix.3 = (a22 * b04 - a21 * b05 - a23 * b03) * det;
-  //   matrix.4 = (a12 * b08 - a10 * b11 - a13 * b07) * det;
-  //   matrix.5 = (a00 * b11 - a02 * b08 + a03 * b07) * det;
-  //   matrix.6 = (a32 * b02 - a30 * b05 - a33 * b01) * det;
-  //   matrix.7 = (a20 * b05 - a22 * b02 + a23 * b01) * det;
-  //   matrix.8 = (a10 * b10 - a11 * b08 + a13 * b06) * det;
-  //   matrix.9 = (a01 * b08 - a00 * b10 - a03 * b06) * det;
-  //   matrix.10 = (a30 * b04 - a31 * b02 + a33 * b00) * det;
-  //   matrix.11 = (a21 * b02 - a20 * b04 - a23 * b00) * det;
-  //   matrix.12 = (a11 * b07 - a10 * b09 - a12 * b06) * det;
-  //   matrix.13 = (a00 * b09 - a01 * b07 + a02 * b06) * det;
-  //   matrix.14 = (a31 * b01 - a30 * b03 - a32 * b00) * det;
-  //   matrix.15 = (a20 * b03 - a21 * b01 + a22 * b00) * det;
-  // }
+/**
+ * Translate a mat4 by the given vector
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to translate
+ * @param {vec3} v vector to translate by
+ * @returns {mat4} out
+ */
+pub fn translate(out: &mut Matrix4, a: &Matrix4, v: &Vector3) {
+  let x=v.0;
+let y=v.1;
+let z=v.2;
+  let a00, a01, a02, a03;
+  let a10, a11, a12, a13;
+  let a20, a21, a22, a23;
 
-  // #[wasm_bindgen(method, js_name = "getTransition")]
-  // pub fn get_transition(&mut self, transition: &mut Vector3) {
-  //   transition.set(self.12, self.13, self.14)
-  // }
+  if (a == out) {
+    out.12 = a.0 * x + a.4 * y + a.8 * z + a.12;
+    out.13 = a.1 * x + a.5 * y + a.9 * z + a.13;
+    out.14 = a.2 * x + a.6 * y + a.10 * z + a.14;
+    out.15 = a.3 * x + a.7 * y + a.11 * z + a.15;
+  } else {
+    a00 = a.0; a01 = a.1; a02 = a.2; a03 = a.3;
+    a10 = a.4; a11 = a.5; a12 = a.6; a13 = a.7;
+    a20 = a.8; a21 = a.9; a22 = a.10; a23 = a.11;
 
-  // #[wasm_bindgen(method, js_name = "getRotation")]
-  // pub fn get_rotation(&mut self, rotation: &mut Euler) {
-  //   let m11 = self.0;
-  //   let m21 = self.1;
-  //   let m31 = self.2;
-  //   let m12 = self.4;
-  //   let m22 = self.5;
-  //   let m32 = self.6;
-  //   let m13 = self.8;
-  //   let m23 = self.9;
-  //   let m33 = self.10;
+    out.0 = a00; out.1 = a01; out.2 = a02; out.3 = a03;
+    out.4 = a10; out.5 = a11; out.6 = a12; out.7 = a13;
+    out.8 = a20; out.9 = a21; out.10 = a22; out.11 = a23;
 
-  //   match rotation.order() {
-  //     EEulerOrder::XYZ => {
-  //       rotation.set_y(f32::asin(clamp_f32(m13, -1., 1.)));
-  //       if f32::abs(m13) < 0.99999 {
-  //         rotation.set_x(f32::atan2(-m23, m33));
-  //         rotation.set_z(f32::atan2(-m12, m11));
-  //       } else {
-  //         rotation.set_x(f32::atan2(m32, m22));
-  //         rotation.set_z(0.);
-  //       }
-  //     }
-  //     EEulerOrder::YXZ => {
-  //       rotation.set_x(f32::asin(-clamp_f32(m23, -1., 1.)));
-  //       if f32::abs(m23) < 0.99999 {
-  //         rotation.set_y(f32::atan2(m13, m33));
-  //         rotation.set_z(f32::atan2(m21, m22));
-  //       } else {
-  //         rotation.set_y(f32::atan2(-m31, m11));
-  //         rotation.set_z(0.);
-  //       }
-  //     }
-  //     EEulerOrder::ZXY => {
-  //       rotation.set_x(f32::asin(clamp_f32(m32, -1., 1.)));
-  //       if f32::abs(m32) < 0.99999 {
-  //         rotation.set_y(f32::atan2(-m31, m33));
-  //         rotation.set_z(f32::atan2(-m12, m22));
-  //       } else {
-  //         rotation.set_y(0.);
-  //         rotation.set_z(f32::atan2(m21, m11));
-  //       }
-  //     }
-  //     EEulerOrder::ZYX => {
-  //       rotation.set_y(f32::asin(-clamp_f32(m31, -1., 1.)));
-  //       if f32::abs(m31) < 0.99999 {
-  //         rotation.set_x(f32::atan2(m32, m33));
-  //         rotation.set_z(f32::atan2(m21, m11));
-  //       } else {
-  //         rotation.set_x(0.);
-  //         rotation.set_z(f32::atan2(-m12, m22));
-  //       }
-  //     }
-  //     EEulerOrder::YZX => {
-  //       rotation.set_z(f32::asin(clamp_f32(m21, -1., 1.)));
-  //       if f32::abs(m21) < 0.99999 {
-  //         rotation.set_x(f32::atan2(-m23, m22));
-  //         rotation.set_y(f32::atan2(-m31, m11));
-  //       } else {
-  //         rotation.set_x(0.);
-  //         rotation.set_y(f32::atan2(m13, m33));
-  //       }
-  //     }
-  //     EEulerOrder::XZY => {
-  //       rotation.set_z(f32::asin(-clamp_f32(m12, -1., 1.)));
-  //       if f32::abs(m12) < 0.99999 {
-  //         rotation.set_x(f32::atan2(m32, m22));
-  //         rotation.set_y(f32::atan2(m13, m11));
-  //       } else {
-  //         rotation.set_x(f32::atan2(-m23, m33));
-  //         rotation.set_y(0.);
-  //       }
-  //     }
-  //   }
-  // }
+    out.12 = a00 * x + a10 * y + a20 * z + a.12;
+    out.13 = a01 * x + a11 * y + a21 * z + a.13;
+    out.14 = a02 * x + a12 * y + a22 * z + a.14;
+    out.15 = a03 * x + a13 * y + a23 * z + a.15;
+  }
 
-  // #[wasm_bindgen(method, js_name = "getScale")]
-  // pub fn get_scale(&mut self, scale: &mut Vector3) {
-  //   let m11 = self.0;
-  //   let m12 = self.1;
-  //   let m13 = self.2;
-  //   let m21 = self.4;
-  //   let m22 = self.5;
-  //   let m23 = self.6;
-  //   let m31 = self.8;
-  //   let m32 = self.9;
-  //   let m33 = self.10;
+  }
 
-  //   scale.set(
-  //     (m11.powi(2) + m12.powi(2) + m13.powi(2)).sqrt(),
-  //     (m21.powi(2) + m22.powi(2) + m23.powi(2)).sqrt(),
-  //     (m31.powi(2) + m32.powi(2) + m33.powi(2)).sqrt(),
-  //   );
-  // }
+/**
+ * Scales the mat4 by the dimensions in the given vec3 not using vectorization
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to scale
+ * @param {vec3} v the vec3 to scale the matrix by
+ * @returns {mat4} out
+ **/
+pub fn scale(out: &mut Matrix4, a: &Matrix4, v: &Vector3) {
+  let x=v.0;
+let y=v.1;
+let z=v.2;
+
+  out.0 = a.0 * x;
+  out.1 = a.1 * x;
+  out.2 = a.2 * x;
+  out.3 = a.3 * x;
+  out.4 = a.4 * y;
+  out.5 = a.5 * y;
+  out.6 = a.6 * y;
+  out.7 = a.7 * y;
+  out.8 = a.8 * z;
+  out.9 = a.9 * z;
+  out.10 = a.10 * z;
+  out.11 = a.11 * z;
+  out.12 = a.12;
+  out.13 = a.13;
+  out.14 = a.14;
+  out.15 = a.15;
+  }
+
+/**
+ * Rotates a mat4 by the given angle around the given axis
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @param {vec3} axis the axis to rotate around
+ * @returns {mat4} out
+ */
+pub fn rotate(out: &mut Matrix4, a: &Matrix4, rad: f32, axis: &Vector3) {
+  let x=axis.0;
+let y=axis.1;
+let z=axis.2;
+  let len=f32::hypot(x;
+let y;
+let z);
+  let s, c, t;
+  let a00, a01, a02, a03;
+  let a10, a11, a12, a13;
+  let a20, a21, a22, a23;
+  let b00, b01, b02;
+  let b10, b11, b12;
+  let b20, b21, b22;
+
+  if (len < EPSILON) { return null; }
+
+  len = 1 / len;
+  x *= len;
+  y *= len;
+  z *= len;
+
+  s = f32::sin(rad);
+  c = f32::cos(rad);
+  t = 1 - c;
+
+  a00 = a.0; a01 = a.1; a02 = a.2; a03 = a.3;
+  a10 = a.4; a11 = a.5; a12 = a.6; a13 = a.7;
+  a20 = a.8; a21 = a.9; a22 = a.10; a23 = a.11;
+
+  // Construct the elements of the rotation matrix
+  b00 = x * x * t + c; b01 = y * x * t + z * s; b02 = z * x * t - y * s;
+  b10 = x * y * t - z * s; b11 = y * y * t + c; b12 = z * y * t + x * s;
+  b20 = x * z * t + y * s; b21 = y * z * t - x * s; b22 = z * z * t + c;
+
+  // Perform rotation-specific matrix multiplication
+  out.0 = a00 * b00 + a10 * b01 + a20 * b02;
+  out.1 = a01 * b00 + a11 * b01 + a21 * b02;
+  out.2 = a02 * b00 + a12 * b01 + a22 * b02;
+  out.3 = a03 * b00 + a13 * b01 + a23 * b02;
+  out.4 = a00 * b10 + a10 * b11 + a20 * b12;
+  out.5 = a01 * b10 + a11 * b11 + a21 * b12;
+  out.6 = a02 * b10 + a12 * b11 + a22 * b12;
+  out.7 = a03 * b10 + a13 * b11 + a23 * b12;
+  out.8 = a00 * b20 + a10 * b21 + a20 * b22;
+  out.9 = a01 * b20 + a11 * b21 + a21 * b22;
+  out.10 = a02 * b20 + a12 * b21 + a22 * b22;
+  out.11 = a03 * b20 + a13 * b21 + a23 * b22;
+
+  if (a !== out) { // If the source and destination differ, copy the unchanged last row
+    out.12 = a.12;
+    out.13 = a.13;
+    out.14 = a.14;
+    out.15 = a.15;
+  }
+  }
+
+/**
+ * Rotates a matrix by the given angle around the X axis
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+pub fn rotateX(out: &mut Matrix4, a: &Matrix4, rad: f32) {
+  let s=f32::sin(rad)c=f32::cos(rad)a10=a.4a11=a.5a12=a.6a13=a.7a20=a.8a21=a.9a22=a.10a23=a.11if(a!==out){//Ifthesourceanddestinationdiffer;
+let copytheunchangedrowsout.0=a.0;
+    out.1  = a.1;
+    out.2  = a.2;
+    out.3  = a.3;
+    out.12 = a.12;
+    out.13 = a.13;
+    out.14 = a.14;
+    out.15 = a.15;
+  }
+
+  // Perform axis-specific matrix multiplication
+  out.4 = a10 * c + a20 * s;
+  out.5 = a11 * c + a21 * s;
+  out.6 = a12 * c + a22 * s;
+  out.7 = a13 * c + a23 * s;
+  out.8 = a20 * c - a10 * s;
+  out.9 = a21 * c - a11 * s;
+  out.10 = a22 * c - a12 * s;
+  out.11 = a23 * c - a13 * s;
+  }
+
+/**
+ * Rotates a matrix by the given angle around the Y axis
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+pub fn rotateY(out: &mut Matrix4, a: &Matrix4, rad: f32) {
+  let s=f32::sin(rad)c=f32::cos(rad)a00=a.0a01=a.1a02=a.2a03=a.3a20=a.8a21=a.9a22=a.10a23=a.11if(a!==out){//Ifthesourceanddestinationdiffer;
+let copytheunchangedrowsout.4=a.4;
+    out.5  = a.5;
+    out.6  = a.6;
+    out.7  = a.7;
+    out.12 = a.12;
+    out.13 = a.13;
+    out.14 = a.14;
+    out.15 = a.15;
+  }
+
+  // Perform axis-specific matrix multiplication
+  out.0 = a00 * c - a20 * s;
+  out.1 = a01 * c - a21 * s;
+  out.2 = a02 * c - a22 * s;
+  out.3 = a03 * c - a23 * s;
+  out.8 = a00 * s + a20 * c;
+  out.9 = a01 * s + a21 * c;
+  out.10 = a02 * s + a22 * c;
+  out.11 = a03 * s + a23 * c;
+  }
+
+/**
+ * Rotates a matrix by the given angle around the Z axis
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+pub fn rotateZ(out: &mut Matrix4, a: &Matrix4, rad: f32) {
+  let s=f32::sin(rad)c=f32::cos(rad)a00=a.0a01=a.1a02=a.2a03=a.3a10=a.4a11=a.5a12=a.6a13=a.7if(a!==out){//Ifthesourceanddestinationdiffer;
+let copytheunchangedlastrowout.8=a.8;
+    out.9  = a.9;
+    out.10 = a.10;
+    out.11 = a.11;
+    out.12 = a.12;
+    out.13 = a.13;
+    out.14 = a.14;
+    out.15 = a.15;
+  }
+
+  // Perform axis-specific matrix multiplication
+  out.0 = a00 * c + a10 * s;
+  out.1 = a01 * c + a11 * s;
+  out.2 = a02 * c + a12 * s;
+  out.3 = a03 * c + a13 * s;
+  out.4 = a10 * c - a00 * s;
+  out.5 = a11 * c - a01 * s;
+  out.6 = a12 * c - a02 * s;
+  out.7 = a13 * c - a03 * s;
+  }
+
+/**
+ * Creates a matrix from a vector translation
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.translate(dest, dest, vec);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {vec3} v Translation vector
+ * @returns {mat4} out
+ */
+pub fn fromTranslation(out: &mut Matrix4, v: &Vector3) {
+  out.0 = 1;
+  out.1 = 0;
+  out.2 = 0;
+  out.3 = 0;
+  out.4 = 0;
+  out.5 = 1;
+  out.6 = 0;
+  out.7 = 0;
+  out.8 = 0;
+  out.9 = 0;
+  out.10 = 1;
+  out.11 = 0;
+  out.12 = v.0;
+  out.13 = v.1;
+  out.14 = v.2;
+  out.15 = 1;
+  }
+
+/**
+ * Creates a matrix from a vector scaling
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.scale(dest, dest, vec);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {vec3} v Scaling vector
+ * @returns {mat4} out
+ */
+pub fn fromScaling(out: &mut Matrix4, v: &Vector3) {
+  out.0 = v.0;
+  out.1 = 0;
+  out.2 = 0;
+  out.3 = 0;
+  out.4 = 0;
+  out.5 = v.1;
+  out.6 = 0;
+  out.7 = 0;
+  out.8 = 0;
+  out.9 = 0;
+  out.10 = v.2;
+  out.11 = 0;
+  out.12 = 0;
+  out.13 = 0;
+  out.14 = 0;
+  out.15 = 1;
+  }
+
+/**
+ * Creates a matrix from a given angle around a given axis
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.rotate(dest, dest, rad, axis);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {Number} rad the angle to rotate the matrix by
+ * @param {vec3} axis the axis to rotate around
+ * @returns {mat4} out
+ */
+pub fn fromRotation(out: &mut Matrix4, rad: f32, axis: &Vector3) {
+  let x=axis.0;
+let y=axis.1;
+let z=axis.2;
+  let len=f32::hypot(x;
+let y;
+let z);
+  let s, c, t;
+
+  if (len < EPSILON) { return null; }
+
+  len = 1 / len;
+  x *= len;
+  y *= len;
+  z *= len;
+
+  s = f32::sin(rad);
+  c = f32::cos(rad);
+  t = 1 - c;
+
+  // Perform rotation-specific matrix multiplication
+  out.0 = x * x * t + c;
+  out.1 = y * x * t + z * s;
+  out.2 = z * x * t - y * s;
+  out.3 = 0;
+  out.4 = x * y * t - z * s;
+  out.5 = y * y * t + c;
+  out.6 = z * y * t + x * s;
+  out.7 = 0;
+  out.8 = x * z * t + y * s;
+  out.9 = y * z * t - x * s;
+  out.10 = z * z * t + c;
+  out.11 = 0;
+  out.12 = 0;
+  out.13 = 0;
+  out.14 = 0;
+  out.15 = 1;
+  }
+
+/**
+ * Creates a matrix from the given angle around the X axis
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.rotateX(dest, dest, rad);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+pub fn fromXRotation(out: &mut Matrix4, rad: f32) {
+  let s = f32::sin(rad);
+  let c = f32::cos(rad);
+
+  // Perform axis-specific matrix multiplication
+  out.0  = 1;
+  out.1  = 0;
+  out.2  = 0;
+  out.3  = 0;
+  out.4 = 0;
+  out.5 = c;
+  out.6 = s;
+  out.7 = 0;
+  out.8 = 0;
+  out.9 = -s;
+  out.10 = c;
+  out.11 = 0;
+  out.12 = 0;
+  out.13 = 0;
+  out.14 = 0;
+  out.15 = 1;
+  }
+
+/**
+ * Creates a matrix from the given angle around the Y axis
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.rotateY(dest, dest, rad);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+pub fn fromYRotation(out: &mut Matrix4, rad: f32) {
+  let s = f32::sin(rad);
+  let c = f32::cos(rad);
+
+  // Perform axis-specific matrix multiplication
+  out.0  = c;
+  out.1  = 0;
+  out.2  = -s;
+  out.3  = 0;
+  out.4 = 0;
+  out.5 = 1;
+  out.6 = 0;
+  out.7 = 0;
+  out.8 = s;
+  out.9 = 0;
+  out.10 = c;
+  out.11 = 0;
+  out.12 = 0;
+  out.13 = 0;
+  out.14 = 0;
+  out.15 = 1;
+  }
+
+/**
+ * Creates a matrix from the given angle around the Z axis
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.rotateZ(dest, dest, rad);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+pub fn fromZRotation(out: &mut Matrix4, rad: f32) {
+  let s = f32::sin(rad);
+  let c = f32::cos(rad);
+
+  // Perform axis-specific matrix multiplication
+  out.0  = c;
+  out.1  = s;
+  out.2  = 0;
+  out.3  = 0;
+  out.4 = -s;
+  out.5 = c;
+  out.6 = 0;
+  out.7 = 0;
+  out.8 = 0;
+  out.9 = 0;
+  out.10 = 1;
+  out.11 = 0;
+  out.12 = 0;
+  out.13 = 0;
+  out.14 = 0;
+  out.15 = 1;
+  }
+
+/**
+ * Creates a matrix from a quaternion rotation and vector translation
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.translate(dest, vec);
+ *     let quatMat = mat4.create();
+ *     quat4.toMat4(quat, quatMat);
+ *     mat4.multiply(dest, quatMat);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {quat4} q Rotation quaternion
+ * @param {vec3} v Translation vector
+ * @returns {mat4} out
+ */
+pub fn fromRotationTranslation(out: &mut Matrix4, q: &undefined, v: &Vector3) {
+  // Quaternion math
+  let x=q.0;
+let y=q.1;
+let z=q.2;
+let w=q.3;
+  let x2 = x + x;
+  let y2 = y + y;
+  let z2 = z + z;
+
+  let xx = x * x2;
+  let xy = x * y2;
+  let xz = x * z2;
+  let yy = y * y2;
+  let yz = y * z2;
+  let zz = z * z2;
+  let wx = w * x2;
+  let wy = w * y2;
+  let wz = w * z2;
+
+  out.0 = 1 - (yy + zz);
+  out.1 = xy + wz;
+  out.2 = xz - wy;
+  out.3 = 0;
+  out.4 = xy - wz;
+  out.5 = 1 - (xx + zz);
+  out.6 = yz + wx;
+  out.7 = 0;
+  out.8 = xz + wy;
+  out.9 = yz - wx;
+  out.10 = 1 - (xx + yy);
+  out.11 = 0;
+  out.12 = v.0;
+  out.13 = v.1;
+  out.14 = v.2;
+  out.15 = 1;
+
+  }
+
+/**
+ * Creates a new mat4 from a dual quat.
+ *
+ * @param {mat4} out Matrix
+ * @param {quat2} a Dual Quaternion
+ * @returns {mat4} mat4 receiving operation result
+ */
+pub fn fromQuat2(out: &mut Matrix4, a: &Quaternion2) {
+  let translation=newARRAY_TYPE(3)bx=-a.0;
+let by=-a.1;
+let bz=-a.2;
+let bw=a.3;
+let ax=a.4;
+let ay=a.5;
+let az=a.6;
+let aw=a.7;
+
+  let magnitude = bx * bx + by * by + bz * bz + bw * bw;
+  //Only scale if it makes sense
+  if (magnitude > 0) {
+    translation.0 = (ax * bw + aw * bx + ay * bz - az * by) * 2 / magnitude;
+    translation.1 = (ay * bw + aw * by + az * bx - ax * bz) * 2 / magnitude;
+    translation.2 = (az * bw + aw * bz + ax * by - ay * bx) * 2 / magnitude;
+  } else {
+    translation.0 = (ax * bw + aw * bx + ay * bz - az * by) * 2;
+    translation.1 = (ay * bw + aw * by + az * bx - ax * bz) * 2;
+    translation.2 = (az * bw + aw * bz + ax * by - ay * bx) * 2;
+  }
+  fromRotationTranslation(out, a, translation);
+  }
+
+/**
+ * Returns the translation vector component of a transformation
+ *  matrix. If a matrix is built with fromRotationTranslation,
+ *  the returned vector will be the same as the translation vector
+ *  originally supplied.
+ * @param  {vec3} out Vector to receive translation component
+ * @param  {mat4} mat Matrix to be decomposed (input)
+ * @return {vec3} out
+ */
+pub fn getTranslation(out, mat) {
+  out.0 = mat.12;
+  out.1 = mat.13;
+  out.2 = mat.14;
+
+  }
+
+/**
+ * Returns the scaling factor component of a transformation
+ *  matrix. If a matrix is built with fromRotationTranslationScale
+ *  with a normalized Quaternion paramter, the returned vector will be
+ *  the same as the scaling vector
+ *  originally supplied.
+ * @param  {vec3} out Vector to receive scaling factor component
+ * @param  {mat4} mat Matrix to be decomposed (input)
+ * @return {vec3} out
+ */
+pub fn getScaling(out, mat) {
+  let m11=mat.0m12=mat.1m13=mat.2m21=mat.4m22=mat.5m23=mat.6m31=mat.8m32=mat.9m33=mat.10out.0=f32::hypot(m11;
+let m12;
+let m13);
+  out.1 = f32::hypot(m21, m22, m23);
+  out.2 = f32::hypot(m31, m32, m33);
+
+  }
+
+/**
+ * Returns a quaternion representing the rotational component
+ *  of a transformation matrix. If a matrix is built with
+ *  fromRotationTranslation, the returned quaternion will be the
+ *  same as the quaternion originally supplied.
+ * @param {quat} out Quaternion to receive the rotation component
+ * @param {mat4} mat Matrix to be decomposed (input)
+ * @return {quat} out
+ */
+pub fn getRotation(out: &mut Quaternion, mat: &Matrix4) {
+  let scaling=newARRAY_TYPE(3)getScaling(scaling;
+let mat);
+
+  let is1 = 1 / scaling.0;
+  let is2 = 1 / scaling.1;
+  let is3 = 1 / scaling.2;
+
+  let sm11 = mat.0 * is1;
+  let sm12 = mat.1 * is2;
+  let sm13 = mat.2 * is3;
+  let sm21 = mat.4 * is1;
+  let sm22 = mat.5 * is2;
+  let sm23 = mat.6 * is3;
+  let sm31 = mat.8 * is1;
+  let sm32 = mat.9 * is2;
+  let sm33 = mat.10 * is3;
+
+  let trace = sm11 + sm22 + sm33;
+  let S = 0;
+
+  if (trace > 0) {
+    S = f32::sqrt(trace + 1.0) * 2;
+    out.3 = 0.25 * S;
+    out.0 = (sm23 - sm32) / S;
+    out.1 = (sm31 - sm13) / S;
+    out.2 = (sm12 - sm21) / S;
+  } else if ((sm11 > sm22) && (sm11 > sm33)) {
+    S = f32::sqrt(1.0 + sm11 - sm22- sm33) * 2;
+    out.3 = (sm23 - sm32) / S;
+    out.0 = 0.25 * S;
+    out.1 = (sm12 + sm21) / S;
+    out.2 = (sm31 + sm13) / S;
+  } else if (sm22 > sm33) {
+    S = f32::sqrt(1.0 + sm22 - sm11 - sm33) * 2;
+    out.3 = (sm31 - sm13) / S;
+    out.0 = (sm12 + sm21) / S;
+    out.1 = 0.25 * S;
+    out.2 = (sm23 + sm32) / S;
+  } else {
+    S = f32::sqrt(1.0 + sm33 - sm11 - sm22) * 2;
+    out.3 = (sm12 - sm21) / S;
+    out.0 = (sm31 + sm13) / S;
+    out.1 = (sm23 + sm32) / S;
+    out.2 = 0.25 * S;
+  }
+
+  }
+
+/**
+ * Creates a matrix from a quaternion rotation, vector translation and vector scale
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.translate(dest, vec);
+ *     let quatMat = mat4.create();
+ *     quat4.toMat4(quat, quatMat);
+ *     mat4.multiply(dest, quatMat);
+ *     mat4.scale(dest, scale)
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {quat4} q Rotation quaternion
+ * @param {vec3} v Translation vector
+ * @param {vec3} s Scaling vector
+ * @returns {mat4} out
+ */
+pub fn fromRotationTranslationScale(out: &mut Matrix4, q: &undefined, v: &Vector3, s: &Vector3) {
+  // Quaternion math
+  let x=q.0;
+let y=q.1;
+let z=q.2;
+let w=q.3;
+  let x2 = x + x;
+  let y2 = y + y;
+  let z2 = z + z;
+
+  let xx = x * x2;
+  let xy = x * y2;
+  let xz = x * z2;
+  let yy = y * y2;
+  let yz = y * z2;
+  let zz = z * z2;
+  let wx = w * x2;
+  let wy = w * y2;
+  let wz = w * z2;
+  let sx = s.0;
+  let sy = s.1;
+  let sz = s.2;
+
+  out.0 = (1 - (yy + zz)) * sx;
+  out.1 = (xy + wz) * sx;
+  out.2 = (xz - wy) * sx;
+  out.3 = 0;
+  out.4 = (xy - wz) * sy;
+  out.5 = (1 - (xx + zz)) * sy;
+  out.6 = (yz + wx) * sy;
+  out.7 = 0;
+  out.8 = (xz + wy) * sz;
+  out.9 = (yz - wx) * sz;
+  out.10 = (1 - (xx + yy)) * sz;
+  out.11 = 0;
+  out.12 = v.0;
+  out.13 = v.1;
+  out.14 = v.2;
+  out.15 = 1;
+
+  }
+
+/**
+ * Creates a matrix from a quaternion rotation, vector translation and vector scale, rotating and scaling around the given origin
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.translate(dest, vec);
+ *     mat4.translate(dest, origin);
+ *     let quatMat = mat4.create();
+ *     quat4.toMat4(quat, quatMat);
+ *     mat4.multiply(dest, quatMat);
+ *     mat4.scale(dest, scale)
+ *     mat4.translate(dest, negativeOrigin);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {quat4} q Rotation quaternion
+ * @param {vec3} v Translation vector
+ * @param {vec3} s Scaling vector
+ * @param {vec3} o The origin vector around which to scale and rotate
+ * @returns {mat4} out
+ */
+pub fn fromRotationTranslationScaleOrigin(out: &mut Matrix4, q: &undefined, v: &Vector3, s: &Vector3, o: &Vector3) {
+  // Quaternion math
+  let x=q.0;
+let y=q.1;
+let z=q.2;
+let w=q.3;
+  let x2 = x + x;
+  let y2 = y + y;
+  let z2 = z + z;
+
+  let xx = x * x2;
+  let xy = x * y2;
+  let xz = x * z2;
+  let yy = y * y2;
+  let yz = y * z2;
+  let zz = z * z2;
+  let wx = w * x2;
+  let wy = w * y2;
+  let wz = w * z2;
+
+  let sx = s.0;
+  let sy = s.1;
+  let sz = s.2;
+
+  let ox = o.0;
+  let oy = o.1;
+  let oz = o.2;
+
+  let out0 = (1 - (yy + zz)) * sx;
+  let out1 = (xy + wz) * sx;
+  let out2 = (xz - wy) * sx;
+  let out4 = (xy - wz) * sy;
+  let out5 = (1 - (xx + zz)) * sy;
+  let out6 = (yz + wx) * sy;
+  let out8 = (xz + wy) * sz;
+  let out9 = (yz - wx) * sz;
+  let out10 = (1 - (xx + yy)) * sz;
+
+  out.0 = out0;
+  out.1 = out1;
+  out.2 = out2;
+  out.3 = 0;
+  out.4 = out4;
+  out.5 = out5;
+  out.6 = out6;
+  out.7 = 0;
+  out.8 = out8;
+  out.9 = out9;
+  out.10 = out10;
+  out.11 = 0;
+  out.12 = v.0 + ox - (out0 * ox + out4 * oy + out8 * oz);
+  out.13 = v.1 + oy - (out1 * ox + out5 * oy + out9 * oz);
+  out.14 = v.2 + oz - (out2 * ox + out6 * oy + out10 * oz);
+  out.15 = 1;
+
+  }
+
+/**
+ * Calculates a 4x4 matrix from the given quaternion
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {quat} q Quaternion to create matrix from
+ *
+ * @returns {mat4} out
+ */
+pub fn fromQuat(out: &mut Matrix4, q: &Quaternion) {
+  let x=q.0;
+let y=q.1;
+let z=q.2;
+let w=q.3;
+  let x2 = x + x;
+  let y2 = y + y;
+  let z2 = z + z;
+
+  let xx = x * x2;
+  let yx = y * x2;
+  let yy = y * y2;
+  let zx = z * x2;
+  let zy = z * y2;
+  let zz = z * z2;
+  let wx = w * x2;
+  let wy = w * y2;
+  let wz = w * z2;
+
+  out.0 = 1 - yy - zz;
+  out.1 = yx + wz;
+  out.2 = zx - wy;
+  out.3 = 0;
+
+  out.4 = yx - wz;
+  out.5 = 1 - xx - zz;
+  out.6 = zy + wx;
+  out.7 = 0;
+
+  out.8 = zx + wy;
+  out.9 = zy - wx;
+  out.10 = 1 - xx - yy;
+  out.11 = 0;
+
+  out.12 = 0;
+  out.13 = 0;
+  out.14 = 0;
+  out.15 = 1;
+
+  }
+
+/**
+ * Generates a frustum matrix with the given bounds
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {Number} left Left bound of the frustum
+ * @param {Number} right Right bound of the frustum
+ * @param {Number} bottom Bottom bound of the frustum
+ * @param {Number} top Top bound of the frustum
+ * @param {Number} near Near bound of the frustum
+ * @param {Number} far Far bound of the frustum
+ * @returns {mat4} out
+ */
+pub fn frustum(out: &mut Matrix4, left: f32, right: f32, bottom: f32, top: f32, near: f32, far: f32) {
+  let rl = 1 / (right - left);
+  let tb = 1 / (top - bottom);
+  let nf = 1 / (near - far);
+  out.0 = (near * 2) * rl;
+  out.1 = 0;
+  out.2 = 0;
+  out.3 = 0;
+  out.4 = 0;
+  out.5 = (near * 2) * tb;
+  out.6 = 0;
+  out.7 = 0;
+  out.8 = (right + left) * rl;
+  out.9 = (top + bottom) * tb;
+  out.10 = (far + near) * nf;
+  out.11 = -1;
+  out.12 = 0;
+  out.13 = 0;
+  out.14 = (far * near * 2) * nf;
+  out.15 = 0;
+  }
+
+/**
+ * Generates a perspective projection matrix with the given bounds.
+ * Passing null/undefined/no value for far will generate infinite projection matrix.
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {number} fovy Vertical field of view in radians
+ * @param {number} aspect Aspect ratio. typically viewport width/height
+ * @param {number} near Near bound of the frustum
+ * @param {number} far Far bound of the frustum, can be null or Infinity
+ * @returns {mat4} out
+ */
+pub fn perspective(out: &mut Matrix4, fovy: &undefined, aspect: &undefined, near: &undefined, far: &undefined) {
+  let f=1.0/f32::tan(fovy/2);
+let nf;
+  out.0 = f / aspect;
+  out.1 = 0;
+  out.2 = 0;
+  out.3 = 0;
+  out.4 = 0;
+  out.5 = f;
+  out.6 = 0;
+  out.7 = 0;
+  out.8 = 0;
+  out.9 = 0;
+  out.11 = -1;
+  out.12 = 0;
+  out.13 = 0;
+  out.15 = 0;
+  if (far != null && far !== Infinity) {
+    nf = 1 / (near - far);
+    out.10 = (far + near) * nf;
+    out.14 = (2 * far * near) * nf;
+  } else {
+    out.10 = -1;
+    out.14 = -2 * near;
+  }
+  }
+
+/**
+ * Generates a perspective projection matrix with the given field of view.
+ * This is primarily useful for generating projection matrices to be used
+ * with the still experiemental WebVR API.
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {Object} fov Object containing the following values: upDegrees, downDegrees, leftDegrees, rightDegrees
+ * @param {number} near Near bound of the frustum
+ * @param {number} far Far bound of the frustum
+ * @returns {mat4} out
+ */
+pub fn perspectiveFromFieldOfView(out: &mut Matrix4, fov: &undefined, near: &undefined, far: &undefined) {
+  let upTan = f32::tan(fov.upDegrees * f32::PI/180.0);
+  let downTan = f32::tan(fov.downDegrees * f32::PI/180.0);
+  let leftTan = f32::tan(fov.leftDegrees * f32::PI/180.0);
+  let rightTan = f32::tan(fov.rightDegrees * f32::PI/180.0);
+  let xScale = 2.0 / (leftTan + rightTan);
+  let yScale = 2.0 / (upTan + downTan);
+
+  out.0 = xScale;
+  out.1 = 0.0;
+  out.2 = 0.0;
+  out.3 = 0.0;
+  out.4 = 0.0;
+  out.5 = yScale;
+  out.6 = 0.0;
+  out.7 = 0.0;
+  out.8 = -((leftTan - rightTan) * xScale * 0.5);
+  out.9 = ((upTan - downTan) * yScale * 0.5);
+  out.10 = far / (near - far);
+  out.11 = -1.0;
+  out.12 = 0.0;
+  out.13 = 0.0;
+  out.14 = (far * near) / (near - far);
+  out.15 = 0.0;
+  }
+
+/**
+ * Generates a orthogonal projection matrix with the given bounds
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {number} left Left bound of the frustum
+ * @param {number} right Right bound of the frustum
+ * @param {number} bottom Bottom bound of the frustum
+ * @param {number} top Top bound of the frustum
+ * @param {number} near Near bound of the frustum
+ * @param {number} far Far bound of the frustum
+ * @returns {mat4} out
+ */
+pub fn ortho(out: &mut Matrix4, left: &undefined, right: &undefined, bottom: &undefined, top: &undefined, near: &undefined, far: &undefined) {
+  let lr = 1 / (left - right);
+  let bt = 1 / (bottom - top);
+  let nf = 1 / (near - far);
+  out.0 = -2 * lr;
+  out.1 = 0;
+  out.2 = 0;
+  out.3 = 0;
+  out.4 = 0;
+  out.5 = -2 * bt;
+  out.6 = 0;
+  out.7 = 0;
+  out.8 = 0;
+  out.9 = 0;
+  out.10 = 2 * nf;
+  out.11 = 0;
+  out.12 = (left + right) * lr;
+  out.13 = (top + bottom) * bt;
+  out.14 = (far + near) * nf;
+  out.15 = 1;
+  }
+
+/**
+ * Generates a look-at matrix with the given eye position, focal point, and up axis.
+ * If you want a matrix that actually makes an object look at another object, you should use targetTo instead.
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {vec3} eye Position of the viewer
+ * @param {vec3} center Point the viewer is looking at
+ * @param {vec3} up vec3 pointing up
+ * @returns {mat4} out
+ */
+pub fn lookAt(out: &mut Matrix4, eye: &Vector3, center: &Vector3, up: &Vector3) {
+  let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
+  let eyex = eye.0;
+  let eyey = eye.1;
+  let eyez = eye.2;
+  let upx = up.0;
+  let upy = up.1;
+  let upz = up.2;
+  let centerx = center.0;
+  let centery = center.1;
+  let centerz = center.2;
+
+  if (f32::abs(eyex - centerx) < EPSILON &&
+      f32::abs(eyey - centery) < EPSILON &&
+      f32::abs(eyez - centerz) < EPSILON) {
+    return identity(out);
+  }
+
+  z0 = eyex - centerx;
+  z1 = eyey - centery;
+  z2 = eyez - centerz;
+
+  len = 1 / f32::hypot(z0, z1, z2);
+  z0 *= len;
+  z1 *= len;
+  z2 *= len;
+
+  x0 = upy * z2 - upz * z1;
+  x1 = upz * z0 - upx * z2;
+  x2 = upx * z1 - upy * z0;
+  len = f32::hypot(x0, x1, x2);
+  if (!len) {
+    x0 = 0;
+    x1 = 0;
+    x2 = 0;
+  } else {
+    len = 1 / len;
+    x0 *= len;
+    x1 *= len;
+    x2 *= len;
+  }
+
+  y0 = z1 * x2 - z2 * x1;
+  y1 = z2 * x0 - z0 * x2;
+  y2 = z0 * x1 - z1 * x0;
+
+  len = f32::hypot(y0, y1, y2);
+  if (!len) {
+    y0 = 0;
+    y1 = 0;
+    y2 = 0;
+  } else {
+    len = 1 / len;
+    y0 *= len;
+    y1 *= len;
+    y2 *= len;
+  }
+
+  out.0 = x0;
+  out.1 = y0;
+  out.2 = z0;
+  out.3 = 0;
+  out.4 = x1;
+  out.5 = y1;
+  out.6 = z1;
+  out.7 = 0;
+  out.8 = x2;
+  out.9 = y2;
+  out.10 = z2;
+  out.11 = 0;
+  out.12 = -(x0 * eyex + x1 * eyey + x2 * eyez);
+  out.13 = -(y0 * eyex + y1 * eyey + y2 * eyez);
+  out.14 = -(z0 * eyex + z1 * eyey + z2 * eyez);
+  out.15 = 1;
+
+  }
+
+/**
+ * Generates a matrix that makes something look at something else.
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {vec3} eye Position of the viewer
+ * @param {vec3} center Point the viewer is looking at
+ * @param {vec3} up vec3 pointing up
+ * @returns {mat4} out
+ */
+pub fn targetTo(out: &mut Matrix4, eye: &Vector3, center: &Vector3, up: &Vector3) {
+  let eyex=eye.0;
+let eyey=eye.1;
+let eyez=eye.2;
+let upx=up.0;
+let upy=up.1;
+let upz=up.2;
+
+  let z0=eyex-target.0;
+let z1=eyey-target.1;
+let z2=eyez-target.2;
+
+  let len = z0*z0 + z1*z1 + z2*z2;
+  if (len > 0) {
+    len = 1 / f32::sqrt(len);
+    z0 *= len;
+    z1 *= len;
+    z2 *= len;
+  }
+
+  let x0 = upy * z2 - upz * z1,
+      x1 = upz * z0 - upx * z2,
+      x2 = upx * z1 - upy * z0;
+
+  len = x0*x0 + x1*x1 + x2*x2;
+  if (len > 0) {
+    len = 1 / f32::sqrt(len);
+    x0 *= len;
+    x1 *= len;
+    x2 *= len;
+  }
+
+  out.0 = x0;
+  out.1 = x1;
+  out.2 = x2;
+  out.3 = 0;
+  out.4 = z1 * x2 - z2 * x1;
+  out.5 = z2 * x0 - z0 * x2;
+  out.6 = z0 * x1 - z1 * x0;
+  out.7 = 0;
+  out.8 = z0;
+  out.9 = z1;
+  out.10 = z2;
+  out.11 = 0;
+  out.12 = eyex;
+  out.13 = eyey;
+  out.14 = eyez;
+  out.15 = 1;
+  };
+
+/**
+ * Returns a string representation of a mat4
+ *
+ * @param {mat4} a matrix to represent as a string
+ * @returns {String} string representation of the matrix
+ */
+pub fn str(a: &Matrix4) {
+  return "mat4(" + a.0 + ", " + a.1 + ", " + a.2 + ", " + a.3 + ", " +
+          a.4 + ", " + a.5 + ", " + a.6 + ", " + a.7 + ", " +
+          a.8 + ", " + a.9 + ", " + a.10 + ", " + a.11 + ", " +
+          a.12 + ", " + a.13 + ", " + a.14 + ", " + a.15 + ")";
+}
+
+/**
+ * Returns Frobenius norm of a mat4
+ *
+ * @param {mat4} a the matrix to calculate Frobenius norm of
+ * @returns {Number} Frobenius norm
+ */
+pub fn frob(a: &Matrix4) {
+  return(f32::hypot(a[0],a[1],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[11],a[12],a[13],a[14],a.15))
+}
+
+/**
+ * Adds two mat4"s
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the first operand
+ * @param {mat4} b the second operand
+ * @returns {mat4} out
+ */
+pub fn add(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
+  out.0 = a.0 + b.0;
+  out.1 = a.1 + b.1;
+  out.2 = a.2 + b.2;
+  out.3 = a.3 + b.3;
+  out.4 = a.4 + b.4;
+  out.5 = a.5 + b.5;
+  out.6 = a.6 + b.6;
+  out.7 = a.7 + b.7;
+  out.8 = a.8 + b.8;
+  out.9 = a.9 + b.9;
+  out.10 = a.10 + b.10;
+  out.11 = a.11 + b.11;
+  out.12 = a.12 + b.12;
+  out.13 = a.13 + b.13;
+  out.14 = a.14 + b.14;
+  out.15 = a.15 + b.15;
+  }
+
+/**
+ * Subtracts matrix b from matrix a
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the first operand
+ * @param {mat4} b the second operand
+ * @returns {mat4} out
+ */
+pub fn subtract(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
+  out.0 = a.0 - b.0;
+  out.1 = a.1 - b.1;
+  out.2 = a.2 - b.2;
+  out.3 = a.3 - b.3;
+  out.4 = a.4 - b.4;
+  out.5 = a.5 - b.5;
+  out.6 = a.6 - b.6;
+  out.7 = a.7 - b.7;
+  out.8 = a.8 - b.8;
+  out.9 = a.9 - b.9;
+  out.10 = a.10 - b.10;
+  out.11 = a.11 - b.11;
+  out.12 = a.12 - b.12;
+  out.13 = a.13 - b.13;
+  out.14 = a.14 - b.14;
+  out.15 = a.15 - b.15;
+  }
+
+/**
+ * Multiply each element of the matrix by a scalar.
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to scale
+ * @param {Number} b amount to scale the matrix"s elements by
+ * @returns {mat4} out
+ */
+pub fn multiplyScalar(out: &mut Matrix4, a: &Matrix4, b: f32) {
+  out.0 = a.0 * b;
+  out.1 = a.1 * b;
+  out.2 = a.2 * b;
+  out.3 = a.3 * b;
+  out.4 = a.4 * b;
+  out.5 = a.5 * b;
+  out.6 = a.6 * b;
+  out.7 = a.7 * b;
+  out.8 = a.8 * b;
+  out.9 = a.9 * b;
+  out.10 = a.10 * b;
+  out.11 = a.11 * b;
+  out.12 = a.12 * b;
+  out.13 = a.13 * b;
+  out.14 = a.14 * b;
+  out.15 = a.15 * b;
+  }
+
+/**
+ * Adds two mat4"s after multiplying each element of the second operand by a scalar value.
+ *
+ * @param {mat4} out the receiving vector
+ * @param {mat4} a the first operand
+ * @param {mat4} b the second operand
+ * @param {Number} scale the amount to scale b"s elements by before adding
+ * @returns {mat4} out
+ */
+pub fn multiplyScalarAndAdd(out: &mut Matrix4, a: &Matrix4, b: &Matrix4, scale: f32) {
+  out.0 = a.0 + (b.0 * scale);
+  out.1 = a.1 + (b.1 * scale);
+  out.2 = a.2 + (b.2 * scale);
+  out.3 = a.3 + (b.3 * scale);
+  out.4 = a.4 + (b.4 * scale);
+  out.5 = a.5 + (b.5 * scale);
+  out.6 = a.6 + (b.6 * scale);
+  out.7 = a.7 + (b.7 * scale);
+  out.8 = a.8 + (b.8 * scale);
+  out.9 = a.9 + (b.9 * scale);
+  out.10 = a.10 + (b.10 * scale);
+  out.11 = a.11 + (b.11 * scale);
+  out.12 = a.12 + (b.12 * scale);
+  out.13 = a.13 + (b.13 * scale);
+  out.14 = a.14 + (b.14 * scale);
+  out.15 = a.15 + (b.15 * scale);
+  }
+
+/**
+ * Returns whether or not the matrices have exactly the same elements in the same position (when compared with ==)
+ *
+ * @param {mat4} a The first matrix.
+ * @param {mat4} b The second matrix.
+ * @returns {Boolean} True if the matrices are equal, false otherwise.
+ */
+pub fn exactEquals(a: &Matrix4, b: &Matrix4) {
+  return a.0 == b.0 && a.1 == b.1 && a.2 == b.2 && a.3 == b.3 &&
+         a.4 == b.4 && a.5 == b.5 && a.6 == b.6 && a.7 == b.7 &&
+         a.8 == b.8 && a.9 == b.9 && a.10 == b.10 && a.11 == b.11 &&
+         a.12 == b.12 && a.13 == b.13 && a.14 == b.14 && a.15 == b.15;
+}
+
+/**
+ * Returns whether or not the matrices have approximately the same elements in the same position.
+ *
+ * @param {mat4} a The first matrix.
+ * @param {mat4} b The second matrix.
+ * @returns {Boolean} True if the matrices are equal, false otherwise.
+ */
+pub fn equals(a: &Matrix4, b: &Matrix4) {
+  let a0  = a.0,  a1  = a.1,  a2  = a.2,  a3  = a.3;
+  let a4  = a.4,  a5  = a.5,  a6  = a.6,  a7  = a.7;
+  let a8  = a.8,  a9  = a.9,  a10 = a.10, a11 = a.11;
+  let a12=a.12;
+let a13=a.13;
+let a14=a.14;
+let a15=a.15;
+
+  let b0  = b.0,  b1  = b.1,  b2  = b.2,  b3  = b.3;
+  let b4  = b.4,  b5  = b.5,  b6  = b.6,  b7  = b.7;
+  let b8  = b.8,  b9  = b.9,  b10 = b.10, b11 = b.11;
+  let b12=b.12;
+let b13=b.13;
+let b14=b.14;
+let b15=b.15;
+
+  return (f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::abs(a0), f32::abs(b0)) &&
+          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::abs(a1), f32::abs(b1)) &&
+          f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::abs(a2), f32::abs(b2)) &&
+          f32::abs(a3 - b3) <= EPSILON*f32::max(1.0, f32::abs(a3), f32::abs(b3)) &&
+          f32::abs(a4 - b4) <= EPSILON*f32::max(1.0, f32::abs(a4), f32::abs(b4)) &&
+          f32::abs(a5 - b5) <= EPSILON*f32::max(1.0, f32::abs(a5), f32::abs(b5)) &&
+          f32::abs(a6 - b6) <= EPSILON*f32::max(1.0, f32::abs(a6), f32::abs(b6)) &&
+          f32::abs(a7 - b7) <= EPSILON*f32::max(1.0, f32::abs(a7), f32::abs(b7)) &&
+          f32::abs(a8 - b8) <= EPSILON*f32::max(1.0, f32::abs(a8), f32::abs(b8)) &&
+          f32::abs(a9 - b9) <= EPSILON*f32::max(1.0, f32::abs(a9), f32::abs(b9)) &&
+          f32::abs(a10 - b10) <= EPSILON*f32::max(1.0, f32::abs(a10), f32::abs(b10)) &&
+          f32::abs(a11 - b11) <= EPSILON*f32::max(1.0, f32::abs(a11), f32::abs(b11)) &&
+          f32::abs(a12 - b12) <= EPSILON*f32::max(1.0, f32::abs(a12), f32::abs(b12)) &&
+          f32::abs(a13 - b13) <= EPSILON*f32::max(1.0, f32::abs(a13), f32::abs(b13)) &&
+          f32::abs(a14 - b14) <= EPSILON*f32::max(1.0, f32::abs(a14), f32::abs(b14)) &&
+          f32::abs(a15 - b15) <= EPSILON*f32::max(1.0, f32::abs(a15), f32::abs(b15)));
+}
+
+/**
+ * Alias for {@link mat4.multiply}
+ * @function
+ */
+pub fn mul(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
+  Matrix4::multiply(out, a, b);
+}
+
+/**
+ * Alias for {@link mat4.subtract}
+ * @function
+ */
+pub fn sub(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
+  Matrix4::subtract(out, a, b);
+}
+
 }

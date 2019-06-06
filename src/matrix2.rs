@@ -5,7 +5,9 @@
  * @Description:
  */
 use wasm_bindgen::prelude::*;
+
 use super::common::*;
+use super::vector2::*;
 
 #[wasm_bindgen]
 pub struct Matrix2(
@@ -236,14 +238,14 @@ impl Matrix2 {
    * @param {vec2} v the vec2 to scale the matrix by
    * @returns {mat2} out
    **/
-  // pub fn scale(out: &mut Matrix2, a: &Matrix2, v) {
-  //   let a0 = a.0, a1 = a.1, a2 = a.2, a3 = a.3;
-  //   let v0 = v.0, v1 = v.1;
-  //   out.0 = a0 * v0;
-  //   out.1 = a1 * v0;
-  //   out.2 = a2 * v1;
-  //   out.3 = a3 * v1;
-  // }
+  pub fn scale(out: &mut Matrix2, a: &Matrix2, v: &Vector2) {
+    let a0 = a.0, a1 = a.1, a2 = a.2, a3 = a.3;
+    let v0 = v.0, v1 = v.1;
+    out.0 = a0 * v0;
+    out.1 = a1 * v0;
+    out.2 = a2 * v1;
+    out.3 = a3 * v1;
+  }
 
   /**
    * Creates a matrix from a given angle
@@ -276,12 +278,12 @@ impl Matrix2 {
    * @param {vec2} v Scaling vector
    * @returns {mat2} out
    */
-  // pub fn fromScaling(out: &mut Matrix2, v) {
-  //   out.0 = v.0;
-  //   out.1 = 0;
-  //   out.2 = 0;
-  //   out.3 = v.1; 
-  // }
+  pub fn fromScaling(out: &mut Matrix2, v: &Vector2) {
+    out.0 = v.0;
+    out.1 = 0;
+    out.2 = 0;
+    out.3 = v.1; 
+  }
 
   /**
    * Returns a string representation of a mat2
@@ -289,9 +291,9 @@ impl Matrix2 {
    * @param {mat2} a matrix to represent as a string
    * @returns {String} string representation of the matrix
    */
-  // pub fn str(a: &Matrix2) -> String {
-  //   "mat2(" + a.0 + ", " + a.1 + ", " + a.2 + ", " + a.3 + ")"
-  // }
+  pub fn str(a: &Matrix2) -> String {
+    "mat2(" + a.0 + ", " + a.1 + ", " + a.2 + ", " + a.3 + ")"
+  }
 
   /**
    * Returns Frobenius norm of a mat2
