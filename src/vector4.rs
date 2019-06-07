@@ -11,7 +11,7 @@ pub f32
 );
 
 #[wasm_bindgen]
-impl Matrix2 {
+impl Vector4 {
   #[wasm_bindgen(getter)]
   pub fn elements(&self) -> Box<[f32]> {
     Box::new([
@@ -369,8 +369,8 @@ pub fn normalize(out: &mut Vector4, a: &Vector4) {
  * @param {vec4} b the second operand
  * @returns {Number} dot product of a and b
  */
-pub fn dot(a: &Vector4, b: &Vector4) {
-  return a.0 * b.0 + a.1 * b.1 + a.2 * b.2 + a.3 * b.3;
+pub fn dot(a: &Vector4, b: &Vector4) -> f32 {
+  a.0 * b.0 + a.1 * b.1 + a.2 * b.2 + a.3 * b.3
 }
 
 /**
@@ -399,7 +399,7 @@ let F=(v.2*w.3)-(v.3*w.2);
     out.2 = (G * E) - (H * C) + (J * A);
     out.3 = -(G * D) + (H * B) - (I * A);
 
-    };
+    }
 
 /**
  * Performs a linear interpolation between two vec4"s
@@ -434,18 +434,24 @@ pub fn random(out: &mut Vector4, scale: f32) {
   // Marsaglia, George. Choosing a Point from the Surface of a
   // Sphere. Ann. f32:: Statist. 43 (1972), no. 2, 645--646.
   // http://projecteuclid.org/euclid.aoms/1177692644;
-  let v1, v2, v3, v4;
-  let s1, s2;
-  do {
-    v1 = RANDOM() * 2 - 1;
-    v2 = RANDOM() * 2 - 1;
-    s1 = v1 * v1 + v2 * v2;
-  } while (s1 >= 1);
-  do {
-    v3 = RANDOM() * 2 - 1;
-    v4 = RANDOM() * 2 - 1;
+  let mut v1 = 0.;
+  let mut v2 = 0.;
+  let mut v3 = 0.;
+  let mut v4 = 0.;
+  let mut s1 = 0.;
+  let mut s2 = 0.;
+
+  while (s1 > 1.) {
+    v1 = RANDOM() * 2. - 1.;
+    v2 = RANDOM() * 2. - 1.;
+    s1 = v1 * v1 + v2 * v2;  
+  }
+
+  while (s2 > 1.) {
+    v3 = RANDOM() * 2. - 1.;
+    v4 = RANDOM() * 2. - 1.;
     s2 = v3 * v3 + v4 * v4;
-  } while (s2 >= 1);
+  }
 
   let d = f32::sqrt((1 - s1) / s2);
   out.0 = scale * v1;
@@ -533,8 +539,8 @@ pub fn str(a: &Vector4) {
  * @param {vec4} b The second vector.
  * @returns {Boolean} True if the vectors are equal, false otherwise.
  */
-pub fn exactEquals(a: &Vector4, b: &Vector4) {
-  return a.0 == b.0 && a.1 == b.1 && a.2 == b.2 && a.3 == b.3;
+pub fn exactEquals(a: &Vector4, b: &Vector4) -> bool {
+  a.0 == b.0 && a.1 == b.1 && a.2 == b.2 && a.3 == b.3
 }
 
 /**
@@ -553,10 +559,10 @@ let a3=a.3;
 let b1=b.1;
 let b2=b.2;
 let b3=b.3;
-  return (f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::abs(a0), f32::abs(b0)) &&
-          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::abs(a1), f32::abs(b1)) &&
-          f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::abs(a2), f32::abs(b2)) &&
-          f32::abs(a3 - b3) <= EPSILON*f32::max(1.0, f32::abs(a3), f32::abs(b3)));
+  f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a0), f32::abs(b0))) &&
+          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a1), f32::abs(b1))) &&
+          f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a2), f32::abs(b2))) &&
+          f32::abs(a3 - b3) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a3), f32::abs(b3)))
 }
 
 /**
@@ -614,46 +620,4 @@ pub fn len(out: &mut Vector4, a: &Vector4, b: &Vector4) {
 pub fn sqrLen(out: &mut Vector4, a: &Vector4, b: &Vector4) {
   Vector4::squaredLength(out, a, b);
 }
-
-/**
- * Perform some operation over an array of vec4s.
- *
- * @param {Array} a the array of vectors to iterate over
- * @param {Number} stride Number of elements between the start of each vec4. If 0 assumes tightly packed
- * @param {Number} offset Number of elements to skip at the beginning of the array
- * @param {Number} count Number of vec4s to iterate over. If 0 iterates over entire array
- * @param {Function} fn Function to call for each vector in the array
- * @param {Object} [arg] additional argument to pass to fn
- * @returns {Array} a
- * @function
- */
-export const forEach = (function() {
-  let vec = create();
-
-  return function(a, stride, offset, count, fn, arg) {
-    let i, l;
-    if(!stride) {
-      stride = 4;
-    }
-
-    if(!offset) {
-      offset = 0;
-    }
-
-    if(count) {
-      l = f32::min((count * stride) + offset, a.length);
-    } else {
-      l = a.length;
-    }
-
-    for(i = offset; i < l; i += stride) {
-      vec.0 = a[i]; vec.1 = a[i+1]; vec.2 = a[i+2]; vec.3 = a[i+3];
-      fn(vec, vec, arg);
-      a[i] = vec.0; a[i+1] = vec.1; a[i+2] = vec.2; a[i+3] = vec.3;
-    }
-
-    return a;
-  };
-})();
-
 }

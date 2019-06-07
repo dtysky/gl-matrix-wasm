@@ -14,7 +14,7 @@ pub f32
 );
 
 #[wasm_bindgen]
-impl Matrix2 {
+impl Quaternion {
   #[wasm_bindgen(getter)]
   pub fn elements(&self) -> Box<[f32]> {
     Box::new([
@@ -46,10 +46,10 @@ pub fn create()  -> Quaternion {
  * @returns {quat} out
  */
 pub fn identity(out: &mut Quaternion) {
-  out.0 = 0;
-  out.1 = 0;
-  out.2 = 0;
-  out.3 = 1;
+  out.0 = 0.;
+  out.1 = 0.;
+  out.2 = 0.;
+  out.3 = 1.;
   }
 
 /**
@@ -83,7 +83,7 @@ pub fn setAxisAngle(out: &mut Quaternion, axis: &Vector3, rad: f32) {
  * @param  {quat} q     Quaternion to be decomposed
  * @return {Number}     Angle, in radians, of the rotation
  */
-pub fn getAxisAngle(out_axis: &Vector3, q: &Quaternion) {
+pub fn getAxisAngle(out_axis: &Vector3, q: &Quaternion) -> f32 {
   let rad = f32::acos(q.3) * 2.0;
   let s = f32::sin(rad / 2.0);
   if (s > EPSILON) {
@@ -92,11 +92,11 @@ pub fn getAxisAngle(out_axis: &Vector3, q: &Quaternion) {
     out_axis.2 = q.2 / s;
   } else {
     // If s is zero, return any axis (no rotation - axis does not matter)
-    out_axis.0 = 1;
-    out_axis.1 = 0;
-    out_axis.2 = 0;
+    out_axis.0 = 1.;
+    out_axis.1 = 0.;
+    out_axis.2 = 0.;
   }
-  return rad;
+  rad
 }
 
 /**
@@ -131,7 +131,7 @@ let bw=b.3;
  * @param {number} rad angle (in radians) to rotate
  * @returns {quat} out
  */
-pub fn rotateX(out: &mut Quaternion, a: &Quaternion, rad: &undefined) {
+pub fn rotateX(out: &mut Quaternion, a: &Quaternion, rad: f32) {
   rad *= 0.5;
 
   let ax=a.0;
@@ -155,7 +155,7 @@ let bw=f32::cos(rad);
  * @param {number} rad angle (in radians) to rotate
  * @returns {quat} out
  */
-pub fn rotateY(out: &mut Quaternion, a: &Quaternion, rad: &undefined) {
+pub fn rotateY(out: &mut Quaternion, a: &Quaternion, rad: f32) {
   rad *= 0.5;
 
   let ax=a.0;
@@ -179,7 +179,7 @@ let bw=f32::cos(rad);
  * @param {number} rad angle (in radians) to rotate
  * @returns {quat} out
  */
-pub fn rotateZ(out: &mut Quaternion, a: &Quaternion, rad: &undefined) {
+pub fn rotateZ(out: &mut Quaternion, a: &Quaternion, rad: f32) {
   rad *= 0.5;
 
   let ax=a.0;
@@ -286,13 +286,13 @@ pub fn random(out: &mut Quaternion) {
   let u2 = RANDOM();
   let u3 = RANDOM();
 
-  let sqrt1MinusU1 = f32::sqrt(1 - u1);
+  let sqrt1MinusU1 = f32::sqrt(1. - u1);
   let sqrtU1 = f32::sqrt(u1);
 
-  out.0 = sqrt1MinusU1 * f32::sin(2.0 * f32::PI * u2);
-  out.1 = sqrt1MinusU1 * f32::cos(2.0 * f32::PI * u2);
-  out.2 = sqrtU1 * f32::sin(2.0 * f32::PI * u3);
-  out.3 = sqrtU1 * f32::cos(2.0 * f32::PI * u3);
+  out.0 = sqrt1MinusU1 * f32::sin(2.0 * PI * u2);
+  out.1 = sqrt1MinusU1 * f32::cos(2.0 * PI * u2);
+  out.2 = sqrtU1 * f32::sin(2.0 * PI * u3);
+  out.3 = sqrtU1 * f32::cos(2.0 * PI * u3);
   }
 
 /**
@@ -308,7 +308,7 @@ let a1=a.1;
 let a2=a.2;
 let a3=a.3;
   let dot = a0*a0 + a1*a1 + a2*a2 + a3*a3;
-  let invDot = if dot == 0. { 0. } else { 1. / dot } ;
+  let invDot = if dot < EPSILON { 0. } else { 1. / dot } ;
 
   // TODO: Would be faster to return [0,0,0,0] immediately if dot == 0
 
@@ -355,18 +355,18 @@ if ( fTrace > 0.0 ) {
   fRoot=f32::sqrt(fTrace+1.0);  // 2w
     out.3 = 0.5 * fRoot;
     fRoot = 0.5/fRoot;  // 1/(4w)
-    out.0 = (m[5]-m.7)*fRoot;
-    out.1 = (m[6]-m.2)*fRoot;
-    out.2 = (m[1]-m.3)*fRoot;
+    out.0 = (m.5-m.7)*fRoot;
+    out.1 = (m.6-m.2)*fRoot;
+    out.2 = (m.1-m.3)*fRoot;
   } else {
     // |w| <= 1/2
-    let i = 0;
+    let i = 0.;
     if ( m.4 > m.0 ) {
-      i = 1;
+      i = 1.;
     }
     if ( m.8 > m[i*3+i] ) {
 
-      i = 2;
+      i = 2.;
     }
     let j = (i+1)%3;
     let k = (i+2)%3;
@@ -391,11 +391,11 @@ if ( fTrace > 0.0 ) {
  * @returns {quat} out
  * @function
  */
-pub fn fromEuler(out: &mut Quaternion, Angle: &undefined, Angle: &undefined, Angle: &undefined) {
-    let halfToRad = 0.5 * f32::PI / 180.0;
-    x *= halfToRad;
-    y *= halfToRad;
-    z *= halfToRad;
+pub fn fromEuler(out: &mut Quaternion, x: f32, y: f32, z: f32) {
+    let halfToRad = 0.5 * PI / 180.0;
+    let x = x * halfToRad;
+    let y = y * halfToRad;
+    let z = z * halfToRad;
 
     let sx = f32::sin(x);
     let cx = f32::cos(x);
@@ -417,9 +417,9 @@ pub fn fromEuler(out: &mut Quaternion, Angle: &undefined, Angle: &undefined, Ang
  * @param {quat} a vector to represent as a string
  * @returns {String} string representation of the vector
  */
-pub fn str(a: &Quaternion) {
-  return "quat(" + a.0 + ", " + a.1 + ", " + a.2 + ", " + a.3 + ")";
-}
+// pub fn str(a: &Quaternion) {
+//   return "quat(" + a.0 + ", " + a.1 + ", " + a.2 + ", " + a.3 + ")";
+// }
 
 /**
  * Creates a new quat initialized with values from an existing quaternion
@@ -428,8 +428,8 @@ pub fn str(a: &Quaternion) {
  * @returns {quat} a new quaternion
  * @function
  */
-pub fn clone(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.clone(out, a, b);
+pub fn clone(a: &Quaternion) -> Quaternion {
+  Quaternion(a.0, a.1, a.2, a.3)
 }
 
 /**
@@ -442,8 +442,8 @@ pub fn clone(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @returns {quat} a new quaternion
  * @function
  */
-pub fn fromValues(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.fromValues(out, a, b);
+pub fn fromValues(x: f32, y: f32, z: f32, w: f32) -> Quaternion {
+  Quaternion(x, y, z, w)
 }
 
 /**
@@ -454,8 +454,11 @@ pub fn fromValues(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @returns {quat} out
  * @function
  */
-pub fn copy(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.copy(out, a, b);
+pub fn copy(out: &mut Quaternion, a: &Quaternion) {
+  out.0 = a.0;
+  out.1 = a.1;
+  out.2 = a.2;
+  out.3 = a.3;
 }
 
 /**
@@ -469,8 +472,11 @@ pub fn copy(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @returns {quat} out
  * @function
  */
-pub fn set(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.set(out, a, b);
+pub fn set(out: &mut Quaternion, x: f32, y: f32, z: f32, w: f32) {
+  out.0 = x;
+  out.1 = y;
+  out.2 = z;
+  out.3 = w;
 }
 
 /**
@@ -483,7 +489,10 @@ pub fn set(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @function
  */
 pub fn add(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.add(out, a, b);
+  out.0 = a.0 + b.0;
+  out.1 = a.1 + b.1;
+  out.2 = a.2 + b.2;
+  out.3 = a.3 + b.3;
 }
 
 /**
@@ -503,8 +512,11 @@ pub fn mul(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @returns {quat} out
  * @function
  */
-pub fn scale(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.scale(out, a, b);
+pub fn scale(out: &mut Quaternion, a: &Quaternion, b: f32) {
+  out.0 = a.0 * b;
+  out.1 = a.1 * b;
+  out.2 = a.2 * b;
+  out.3 = a.3 * b;
 }
 
 /**
@@ -515,8 +527,8 @@ pub fn scale(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @returns {Number} dot product of a and b
  * @function
  */
-pub fn dot(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.dot(out, a, b);
+pub fn dot(a: &Quaternion, b: &Quaternion) -> f32 {
+  a.0 * b.0 + a.1 * b.1 + a.2 * b.2 + a.3 * b.3
 }
 
 /**
@@ -529,8 +541,15 @@ pub fn dot(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @returns {quat} out
  * @function
  */
-pub fn lerp(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.lerp(out, a, b);
+pub fn lerp(out: &mut Quaternion, a: &Quaternion, b: &Quaternion, t: f32) {
+  let ax = a.0;
+  let ay = a.1;
+  let az = a.2;
+  let aw = a.3;
+  out.0 = ax + t * (b.0 - ax);
+  out.1 = ay + t * (b.1 - ay);
+  out.2 = az + t * (b.2 - az);
+  out.3 = aw + t * (b.3 - aw);
 }
 
 /**
@@ -539,8 +558,12 @@ pub fn lerp(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @param {quat} a vector to calculate length of
  * @returns {Number} length of a
  */
-pub fn length(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.length(out, a, b);
+pub fn length(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> f32 {
+  let x = a.0;
+  let y = a.1;
+  let z = a.2;
+  let w = a.3;
+  (x.powi(2) + y.powi(2) +z.powi(2)+w.powi(2)).sqrt()
 }
 
 /**
@@ -558,8 +581,12 @@ pub fn len(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @returns {Number} squared length of a
  * @function
  */
-pub fn squaredLength(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.squaredLength(out, a, b);
+pub fn squaredLength(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> f32 {
+  let x = a.0;
+  let y = a.1;
+  let z = a.2;
+  let w = a.3;
+  x*x + y*y + z*z + w*w
 }
 
 /**
@@ -578,8 +605,19 @@ pub fn sqrLen(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @returns {quat} out
  * @function
  */
-pub fn normalize(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.normalize(out, a, b);
+pub fn normalize(out: &mut Quaternion, a: &Quaternion) {
+  let x = a.0;
+  let y = a.1;
+  let z = a.2;
+  let w = a.3;
+  let len = x*x + y*y + z*z + w*w;
+  if (len > EPSILON) {
+    len = 1. / f32::sqrt(len);
+  }
+  out.0 = x * len;
+  out.1 = y * len;
+  out.2 = z * len;
+  out.3 = w * len;
 }
 
 /**
@@ -589,8 +627,8 @@ pub fn normalize(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @param {quat} b The second quaternion.
  * @returns {Boolean} True if the vectors are equal, false otherwise.
  */
-pub fn exactEquals(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.exactEquals(out, a, b);
+pub fn exactEquals(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> bool {
+  a.0 == b.0 && a.1 == b.1 && a.2 == b.2 && a.3 == b.3
 }
 
 /**
@@ -600,8 +638,19 @@ pub fn exactEquals(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @param {quat} b The second vector.
  * @returns {Boolean} True if the vectors are equal, false otherwise.
  */
-pub fn equals(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  Quaternion::vec4.equals(out, a, b);
+pub fn equals(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> bool {
+  let a0=a.0;
+let a1=a.1;
+let a2=a.2;
+let a3=a.3;
+  let b0=b.0;
+let b1=b.1;
+let b2=b.2;
+let b3=b.3;
+  f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a0), f32::abs(b0))) &&
+          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a1), f32::abs(b1))) &&
+          f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a2), f32::abs(b2))) &&
+          f32::abs(a3 - b3) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a3), f32::abs(b3)))
 }
 
 /**
@@ -615,31 +664,31 @@ pub fn equals(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @param {vec3} b the destination vector
  * @returns {quat} out
  */
-pub fn rotationTo(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-  let tmpvec3 = Vector3::create();
-  let xUnitVec3 = Vector3::fromValues(1,0,0);
-  let yUnitVec3 = Vector3::fromValues(0,1,0);
+pub fn rotationTo(out: &mut Quaternion, a: &Vector3, b: &Vector3) {
+  let tmpvec3 = &mut Vector3::create();
+  let xUnitVec3 = &mut Vector3::fromValues(1.,0.,0.);
+  let yUnitVec3 = &mut Vector3::fromValues(0.,1.,0.);
 
   let dot = Vector3::dot(a, b);
   if (dot < -0.999999) {
     Vector3::cross(tmpvec3, xUnitVec3, a);
-    if (Vector3::len(tmpvec3) < 0.000001) {
+    if (Vector3::len(tmpvec3) < EPSILON) {
       Vector3::cross(tmpvec3, yUnitVec3, a);
     }
     Vector3::normalize(tmpvec3, tmpvec3);
-    setAxisAngle(out, tmpvec3, f32::PI);
+    Quaternion::setAxisAngle(out, tmpvec3, PI);
         } else if (dot > 0.999999) {
-    out.0 = 0;
-    out.1 = 0;
-    out.2 = 0;
-    out.3 = 1;
+    out.0 = 0.;
+    out.1 = 0.;
+    out.2 = 0.;
+    out.3 = 1.;
         } else {
     Vector3::cross(tmpvec3, a, b);
     out.0 = tmpvec3.0;
     out.1 = tmpvec3.1;
     out.2 = tmpvec3.2;
-    out.3 = 1 + dot;
-    return normalize(out, out);
+    out.3 = 1. + dot;
+    Quaternion::normalize(out, out);
   }
 }
 
@@ -655,12 +704,12 @@ pub fn rotationTo(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
  * @returns {quat} out
  */
 pub fn sqlerp(out: &mut Quaternion, a: &Quaternion, b: &Quaternion, c: &Quaternion, d: &Quaternion, t: f32) {
-  let temp1 = Quaternion::create();
-  let temp2 = Quaternion::create();
+  let temp1 = &mut Quaternion::create();
+  let temp2 = &mut Quaternion::create();
 
   Quaternion::slerp(temp1, a, d, t);
   Quaternion::slerp(temp2, b, c, t);
-  Quaternion::slerp(out, temp1, temp2, 2 * t * (1 - t));
+  Quaternion::slerp(out, temp1, temp2, 2. * t * (1. - t));
 }
 
 /**
@@ -674,7 +723,7 @@ pub fn sqlerp(out: &mut Quaternion, a: &Quaternion, b: &Quaternion, c: &Quaterni
  * @returns {quat} out
  */
 pub fn setAxes(out: &mut Quaternion, view: &Vector3, right: &Vector3, up: &Vector3) {
-  let matr = Matrix3::create();
+  let matr = &Matrix3::create();
 
     matr.0 = right.0;
     matr.3 = right.1;
@@ -688,6 +737,7 @@ pub fn setAxes(out: &mut Quaternion, view: &Vector3, right: &Vector3, up: &Vecto
     matr.5 = -view.1;
     matr.8 = -view.2;
 
-    Quaternion::normalize(out, Quaternion::fromMat3(out, matr));
+    Quaternion::fromMat3(out, matr);
+    Quaternion::normalize(out, out);
 }
 }

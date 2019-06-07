@@ -9,7 +9,7 @@ pub f32
 );
 
 #[wasm_bindgen]
-impl Matrix2 {
+impl Vector2 {
   #[wasm_bindgen(getter)]
   pub fn elements(&self) -> Box<[f32]> {
     Box::new([
@@ -335,7 +335,7 @@ pub fn dot(a: &Vector2, b: &Vector2) {
  */
 pub fn cross(out: &mut Vector3, a: &Vector2, b: &Vector2) {
   let z = a.0 * b.1 - a.1 * b.0;
-  out.0 = out.1 = 0;
+  out.0 = out.1 = 0.;
   out.2 = z;
   }
 
@@ -364,7 +364,7 @@ let ay=a.1;
  */
 pub fn random(out: &mut Vector2, scale: f32) {
   scale = scale || 1.0;
-  let r = RANDOM() * 2.0 * f32::PI;
+  let r = RANDOM() * 2.0 * PI;
   out.0 = f32::cos(r) * scale;
   out.1 = f32::sin(r) * scale;
   }
@@ -484,7 +484,7 @@ let y2=b.1;
     return 0;
   }
   else if(cosine < -1.0) {
-    return f32::PI;
+    return PI;
   } else {
     return f32::acos(cosine);
   }
@@ -534,8 +534,8 @@ pub fn equals(a: &Vector2, b: &Vector2) {
 let a1=a.1;
   let b0=b.0;
 let b1=b.1;
-  return (f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::abs(a0), f32::abs(b0)) &&
-          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::abs(a1), f32::abs(b1)));
+  return (f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a0), f32::abs(b0))) &&
+          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a1), f32::abs(b1))));
 }
 
 /**

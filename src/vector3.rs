@@ -10,7 +10,7 @@ pub f32
 );
 
 #[wasm_bindgen]
-impl Matrix2 {
+impl Vector3 {
   #[wasm_bindgen(getter)]
   pub fn elements(&self) -> Box<[f32]> {
     Box::new([
@@ -345,7 +345,7 @@ pub fn normalize(out: &mut Vector3, a: &Vector3) {
  * @param {vec3} b the second operand
  * @returns {Number} dot product of a and b
  */
-pub fn dot(a: &Vector3, b: &Vector3) {
+pub fn dot(a: &Vector3, b: &Vector3) -> f32 {
   return a.0 * b.0 + a.1 * b.1 + a.2 * b.2;
 }
 
@@ -448,7 +448,7 @@ pub fn bezier(out: &mut Vector3, a: &Vector3, b: &Vector3, c: &Vector3, d: &Vect
 pub fn random(out: &mut Vector3, scale: f32) {
   scale = scale || 1.0;
 
-  let r = RANDOM() * 2.0 * f32::PI;
+  let r = RANDOM() * 2.0 * PI;
   let z = (RANDOM() * 2.0) - 1.0;
   let zScale = f32::sqrt(1.0-z*z) * scale;
 
@@ -512,28 +512,20 @@ let qw=q.3;
     let x=a.0;
 let y=a.1;
 let z=a.2;
-    // let qvec=[qx;
-let qy;
-let qz];
-    // let uv=vec3.cross([];
-let qvec;
-let a);
-    let uvx=qy*z-qz*y;
-let uvy=qz*x-qx*z;
-let uvz=qx*y-qy*x;
-    // let uuv=vec3.cross([];
-let qvec;
-let uv);
-    let uuvx=qy*uvz-qz*uvy;
-let uuvy=qz*uvx-qx*uvz;
-let uuvz=qx*uvy-qy*uvx;
+    let mut uvx=qy*z-qz*y;
+let mut uvy=qz*x-qx*z;
+let mut uvz=qx*y-qy*x;
+    let mut uuvx=qy*uvz-qz*uvy;
+let mut uuvy=qz*uvx-qx*uvz;
+let mut uuvz=qx*uvy-qy*uvx;
     // vec3.scale(uv, uv, 2 * w);
-    let w2=qw*2uvx*=w2uvy*=w2uvz*=w2//vec3.scale(uuv;
-let uuv;
-let 2);
-    uuvx *= 2;
-    uuvy *= 2;
-    uuvz *= 2;
+    let w2=qw*2;
+    uvx*=w2;
+    uvy*=w2;
+    uvz*=w2;
+    uuvx *= 2.;
+    uuvy *= 2.;
+    uuvz *= 2.;
     // return vec3.add(out, a, vec3.add(out, uv, uuv));
     out.0 = x + uvx + uuvx;
     out.1 = y + uvy + uuvy;
@@ -631,24 +623,19 @@ let r=[];
  * @returns {Number} The angle in radians
  */
 pub fn angle(a: &Vector3, b: &Vector3) {
-  let tempA=fromValues(a.0;
-let a.1;
-let a.2);
-  let tempB=fromValues(b.0;
-let b.1;
-let b.2);
+  let tempA=&Vector3::fromValues(a.0, a.1, a.2);
+  let tempB=&Vector3::fromValues(b.0, b.1, b.2);
 
-  normalize(tempA, tempA);
-  normalize(tempB, tempB);
+  Vector3::normalize(tempA, tempA);
+  Vector3::normalize(tempB, tempB);
 
-  let cosine=dot(tempA;
-let tempB);
+  let cosine=dot(tempA, tempB);
 
   if(cosine > 1.0) {
     return 0;
   }
   else if(cosine < -1.0) {
-    return f32::PI;
+    return PI;
   } else {
     return f32::acos(cosine);
   }
@@ -701,9 +688,9 @@ let a2=a.2;
   let b0=b.0;
 let b1=b.1;
 let b2=b.2;
-  return (f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::abs(a0), f32::abs(b0)) &&
-          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::abs(a1), f32::abs(b1)) &&
-          f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::abs(a2), f32::abs(b2)));
+  return (f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a0), f32::abs(b0))) &&
+          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a1), f32::abs(b1))) &&
+          f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a2), f32::abs(b2))));
 }
 
 /**
@@ -750,57 +737,15 @@ pub fn sqrDist(out: &mut Vector3, a: &Vector3, b: &Vector3) {
  * Alias for {@link vec3.length}
  * @function
  */
-pub fn len(out: &mut Vector3, a: &Vector3, b: &Vector3) {
-  Vector3::length(out, a, b);
+pub fn len(a: &Vector3) -> f32 {
+  Vector3::length(a)
 }
 
 /**
  * Alias for {@link vec3.squaredLength}
  * @function
  */
-pub fn sqrLen(out: &mut Vector3, a: &Vector3, b: &Vector3) {
-  Vector3::squaredLength(out, a, b);
+pub fn sqrLen(a: &Vector3) -> f32 {
+  Vector3::squaredLength(a)
 }
-
-/**
- * Perform some operation over an array of vec3s.
- *
- * @param {Array} a the array of vectors to iterate over
- * @param {Number} stride Number of elements between the start of each vec3. If 0 assumes tightly packed
- * @param {Number} offset Number of elements to skip at the beginning of the array
- * @param {Number} count Number of vec3s to iterate over. If 0 iterates over entire array
- * @param {Function} fn Function to call for each vector in the array
- * @param {Object} [arg] additional argument to pass to fn
- * @returns {Array} a
- * @function
- */
-export const forEach = (function() {
-  let vec = create();
-
-  return function(a, stride, offset, count, fn, arg) {
-    let i, l;
-    if(!stride) {
-      stride = 3;
-    }
-
-    if(!offset) {
-      offset = 0;
-    }
-
-    if(count) {
-      l = f32::min((count * stride) + offset, a.length);
-    } else {
-      l = a.length;
-    }
-
-    for(i = offset; i < l; i += stride) {
-      vec.0 = a[i]; vec.1 = a[i+1]; vec.2 = a[i+2];
-      fn(vec, vec, arg);
-      a[i] = vec.0; a[i+1] = vec.1; a[i+2] = vec.2;
-    }
-
-    return a;
-  };
-})();
-
 }

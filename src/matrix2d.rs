@@ -1,24 +1,29 @@
 use wasm_bindgen::prelude::*;
   
 use super::common::*;
+use super::vector2::*;
 
 #[wasm_bindgen]
 pub struct Matrix2d(
   pub f32,
 pub f32,
 pub f32,
+pub f32,
+pub f32,
 pub f32
 );
 
 #[wasm_bindgen]
-impl Matrix2 {
+impl Matrix2d {
   #[wasm_bindgen(getter)]
   pub fn elements(&self) -> Box<[f32]> {
     Box::new([
       self.0,
 self.1,
 self.2,
-self.3
+self.3,
+self.4,
+self.5
     ])
   }
 
@@ -84,12 +89,12 @@ pub fn copy(out: &mut Matrix2d, a: &Matrix2d) {
  * @returns {mat2d} out
  */
 pub fn identity(out: &mut Matrix2d) {
-  out.0 = 1;
-  out.1 = 0;
-  out.2 = 0;
-  out.3 = 1;
-  out.4 = 0;
-  out.5 = 0;
+  out.0 = 1.;
+  out.1 = 0.;
+  out.2 = 0.;
+  out.3 = 1.;
+  out.4 = 0.;
+  out.5 = 0.;
   }
 
 /**
@@ -144,8 +149,8 @@ let ad=a.3;
 let aty=a.5;
 
   let det = aa * ad - ab * ac;
-  if(!det){
-    return null;
+  if(det < EPSILON){
+    return;
   }
   det = 1.0 / det;
 
@@ -163,8 +168,8 @@ let aty=a.5;
  * @param {mat2d} a the source matrix
  * @returns {Number} determinant of a
  */
-pub fn determinant(a: &Matrix2d) {
-  return a.0 * a.3 - a.1 * a.2;
+pub fn determinant(a: &Matrix2d) -> f32 {
+  a.0 * a.3 - a.1 * a.2
 }
 
 /**
@@ -289,8 +294,8 @@ let c=f32::cos(rad);
   out.1 = s;
   out.2 = -s;
   out.3 = c;
-  out.4 = 0;
-  out.5 = 0;
+  out.4 = 0.;
+  out.5 = 0.;
   }
 
 /**
@@ -306,11 +311,11 @@ let c=f32::cos(rad);
  */
 pub fn fromScaling(out: &mut Matrix2d, v: &Vector2) {
   out.0 = v.0;
-  out.1 = 0;
-  out.2 = 0;
+  out.1 = 0.;
+  out.2 = 0.;
   out.3 = v.1;
-  out.4 = 0;
-  out.5 = 0;
+  out.4 = 0.;
+  out.5 = 0.;
   }
 
 /**
@@ -325,10 +330,10 @@ pub fn fromScaling(out: &mut Matrix2d, v: &Vector2) {
  * @returns {mat2d} out
  */
 pub fn fromTranslation(out: &mut Matrix2d, v: &Vector2) {
-  out.0 = 1;
-  out.1 = 0;
-  out.2 = 0;
-  out.3 = 1;
+  out.0 = 1.;
+  out.1 = 0.;
+  out.2 = 0.;
+  out.3 = 1.;
   out.4 = v.0;
   out.5 = v.1;
   }
@@ -339,10 +344,10 @@ pub fn fromTranslation(out: &mut Matrix2d, v: &Vector2) {
  * @param {mat2d} a matrix to represent as a string
  * @returns {String} string representation of the matrix
  */
-pub fn str(a: &Matrix2d) {
-  return "mat2d(" + a.0 + ", " + a.1 + ", " + a.2 + ", " +
-          a.3 + ", " + a.4 + ", " + a.5 + ")";
-}
+// pub fn str(a: &Matrix2d) {
+//   return "mat2d(" + a.0 + ", " + a.1 + ", " + a.2 + ", " +
+//           a.3 + ", " + a.4 + ", " + a.5 + ")";
+// }
 
 /**
  * Returns Frobenius norm of a mat2d
@@ -350,8 +355,8 @@ pub fn str(a: &Matrix2d) {
  * @param {mat2d} a the matrix to calculate Frobenius norm of
  * @returns {Number} Frobenius norm
  */
-pub fn frob(a: &Matrix2d) {
-  return(f32::hypot(a[0],a[1],a[2],a[3],a[4],a.5,1))
+pub fn frob(a: &Matrix2d) -> f32 {
+    (a.0.powi(2) + a.1.powi(2) + a.2.powi(2) + a.3.powi(2)+ a.4.powi(2)+ a.5.powi(2) + 1.).sqrt()
 }
 
 /**
@@ -430,8 +435,8 @@ pub fn multiplyScalarAndAdd(out: &mut Matrix2d, a: &Matrix2d, b: &Matrix2d, scal
  * @param {mat2d} b The second matrix.
  * @returns {Boolean} True if the matrices are equal, false otherwise.
  */
-pub fn exactEquals(a: &Matrix2d, b: &Matrix2d) {
-  return a.0 == b.0 && a.1 == b.1 && a.2 == b.2 && a.3 == b.3 && a.4 == b.4 && a.5 == b.5;
+pub fn exactEquals(a: &Matrix2d, b: &Matrix2d) -> bool {
+  a.0 == b.0 && a.1 == b.1 && a.2 == b.2 && a.3 == b.3 && a.4 == b.4 && a.5 == b.5
 }
 
 /**
@@ -441,7 +446,7 @@ pub fn exactEquals(a: &Matrix2d, b: &Matrix2d) {
  * @param {mat2d} b The second matrix.
  * @returns {Boolean} True if the matrices are equal, false otherwise.
  */
-pub fn equals(a: &Matrix2d, b: &Matrix2d) {
+pub fn equals(a: &Matrix2d, b: &Matrix2d) -> bool {
   let a0=a.0;
 let a1=a.1;
 let a2=a.2;
@@ -454,12 +459,12 @@ let b2=b.2;
 let b3=b.3;
 let b4=b.4;
 let b5=b.5;
-  return (f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::abs(a0), f32::abs(b0)) &&
-          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::abs(a1), f32::abs(b1)) &&
-          f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::abs(a2), f32::abs(b2)) &&
-          f32::abs(a3 - b3) <= EPSILON*f32::max(1.0, f32::abs(a3), f32::abs(b3)) &&
-          f32::abs(a4 - b4) <= EPSILON*f32::max(1.0, f32::abs(a4), f32::abs(b4)) &&
-          f32::abs(a5 - b5) <= EPSILON*f32::max(1.0, f32::abs(a5), f32::abs(b5)));
+    f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a0), f32::abs(b0))) &&
+    f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a1), f32::abs(b1))) &&
+    f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a2), f32::abs(b2))) &&
+    f32::abs(a3 - b3) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a3), f32::abs(b3))) &&
+    f32::abs(a4 - b4) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a4), f32::abs(b4))) &&
+    f32::abs(a5 - b5) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a5), f32::abs(b5)))
 }
 
 /**

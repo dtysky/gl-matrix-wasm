@@ -3,24 +3,34 @@ use wasm_bindgen::prelude::*;
 use super::common::*;
 use super::quaternion::*;
 use super::matrix4::*;
+use super::matrix3::*;
+use super::vector3::*;
 
 #[wasm_bindgen]
 pub struct Quaternion2(
   pub f32,
 pub f32,
 pub f32,
+pub f32,
+pub f32,
+pub f32,
+pub f32,
 pub f32
 );
 
 #[wasm_bindgen]
-impl Matrix2 {
+impl Quaternion2 {
   #[wasm_bindgen(getter)]
   pub fn elements(&self) -> Box<[f32]> {
     Box::new([
       self.0,
 self.1,
 self.2,
-self.3
+self.3,
+self.4,
+self.5,
+self.6,
+self.7
     ])
   }
 
@@ -85,14 +95,21 @@ pub fn fromValues(x1: f32, y1: f32, z1: f32, w1: f32, x2: f32, y2: f32, z2: f32,
  * @returns {quat2} new dual quaternion
  * @function
  */
-pub fn fromRotationTranslationValues(x1: f32, y1: f32, z1: f32, w1: f32, x2: f32, y2: f32, z2: f32) {
-  let out=newARRAY_TYPE(8)out.0=x1out.1=y1out.2=z1out.3=w1ax=x2*0.5;
+pub fn fromRotationTranslationValues(x1: f32, y1: f32, z1: f32, w1: f32, x2: f32, y2: f32, z2: f32) -> Quaternion2 {
+  let out=&mut Quaternion2::create();
+  out.0=x1;
+  out.1=y1;
+  out.2=z1;
+  out.3=w1;
+  let ax=x2*0.5;
 let ay=y2*0.5;
 let az=z2*0.5;
   out.4 = ax * w1 + ay * z1 - az * y1;
   out.5 = ay * w1 + az * x1 - ax * z1;
   out.6 = az * w1 + ax * y1 - ay * x1;
   out.7 = -ax * x1 - ay * y1 - az * z1;
+
+  out
   }
 
 /**
@@ -131,14 +148,14 @@ let bw=q.3;
  * @function
  */
 pub fn fromTranslation(dual: &Quaternion2, t: &Vector3) {
-  out.0 = 0;
-  out.1 = 0;
-  out.2 = 0;
-  out.3 = 1;
+  out.0 = 0.;
+  out.1 = 0.;
+  out.2 = 0.;
+  out.3 = 1.;
   out.4 = t.0 * 0.5;
   out.5 = t.1 * 0.5;
   out.6 = t.2 * 0.5;
-  out.7 = 0;
+  out.7 = 0.;
   }
 
 /**
@@ -154,10 +171,10 @@ pub fn fromRotation(dual: &Quaternion2, q: &Quaternion) {
   out.1 = q.1;
   out.2 = q.2;
   out.3 = q.3;
-  out.4 = 0;
-  out.5 = 0;
-  out.6 = 0;
-  out.7 = 0;
+  out.4 = 0.;
+  out.5 = 0.;
+  out.6 = 0.;
+  out.7 = 0.;
   }
 
 /**
@@ -170,11 +187,11 @@ pub fn fromRotation(dual: &Quaternion2, q: &Quaternion) {
  */
 pub fn fromMat4(out: &mut Quaternion2, a: &Matrix4) {
   //TODO Optimize this
-  let outer=quat.create()mat4.getRotation(outer;
-let a);
-  let t=newARRAY_TYPE(3)mat4.getTranslation(t;
-let a);
-  fromRotationTranslation(out, outer, t);
+  let outer=&Quaternion::create();
+  Matrix4::getRotation(outer, a);
+  let t=&Vector3::create();
+  Matrix4::getTranslation(t, a);
+  Quaternion2::fromRotationTranslation(out, outer, t);
   }
 
 /**
@@ -203,14 +220,14 @@ pub fn copy(out: &mut Quaternion2, a: &Quaternion2) {
  * @returns {quat2} out
  */
 pub fn identity(out: &mut Quaternion2) {
-  out.0 = 0;
-  out.1 = 0;
-  out.2 = 0;
-  out.3 = 1;
-  out.4 = 0;
-  out.5 = 0;
-  out.6 = 0;
-  out.7 = 0;
+  out.0 = 0.;
+  out.1 = 0.;
+  out.2 = 0.;
+  out.3 = 1.;
+  out.4 = 0.;
+  out.5 = 0.;
+  out.6 = 0.;
+  out.7 = 0.;
   }
 
 /**
@@ -256,7 +273,7 @@ pub fn getReal(out: &mut Quaternion2, a: &Quaternion2, b: &Quaternion2) {
  * @param  {quat2} a Dual Quaternion
  * @return {quat} dual part
  */
-pub fn getDual(out, a) {
+pub fn getDual(out: &mut Quaternion, a: &Quaternion2) {
   out.0 = a.4;
   out.1 = a.5;
   out.2 = a.6;
@@ -296,7 +313,7 @@ pub fn setDual(out: &mut Quaternion2, q: &Quaternion, out: &mut Quaternion2, q: 
  * @param  {quat2} a Dual Quaternion to be decomposed
  * @return {vec3} translation
  */
-pub fn getTranslation(out, a) {
+pub fn getTranslation(out: &mut Vector3, a: &Quaternion2) {
   let ax=a.4;
 let ay=a.5;
 let az=a.6;
@@ -523,19 +540,19 @@ pub fn rotateAroundAxis(out: &mut Quaternion2, a: &Quaternion2, axis: &Vector3, 
   let bz = s * axis.2 / axisLength;
   let bw = f32::cos(rad);
 
-  let ax1 = a.0,
-    ay1 = a.1,
-    az1 = a.2,
-    aw1 = a.3;
+  let ax1 = a.0;
+    let ay1 = a.1;
+    let az1 = a.2;
+    let aw1 = a.3;
   out.0 = ax1 * bw + aw1 * bx + ay1 * bz - az1 * by;
   out.1 = ay1 * bw + aw1 * by + az1 * bx - ax1 * bz;
   out.2 = az1 * bw + aw1 * bz + ax1 * by - ay1 * bx;
   out.3 = aw1 * bw - ax1 * bx - ay1 * by - az1 * bz;
 
-  let ax = a.4,
-    ay = a.5,
-    az = a.6,
-    aw = a.7;
+  let ax = a.4;
+    let ay = a.5;
+    let az = a.6;
+    let aw = a.7;
   out.4 = ax * bw + aw * bx + ay * bz - az * by;
   out.5 = ay * bw + aw * by + az * bx - ax * bz;
   out.6 = az * bw + aw * bz + ax * by - ay * bx;
@@ -635,7 +652,7 @@ pub fn scale(out: &mut Quaternion2, a: &Quaternion2, b: f32) {
  * @function
  */
 pub fn dot(out: &mut Quaternion2, a: &Quaternion2, b: &Quaternion2) {
-  Quaternion2::quat.dot(out, a, b);
+  Quaternion2::dot(out, a, b);
 }
 
 /**
@@ -649,8 +666,8 @@ pub fn dot(out: &mut Quaternion2, a: &Quaternion2, b: &Quaternion2) {
  * @returns {quat2} out
  */
 pub fn lerp(a: &Quaternion2, b: &Quaternion2, out: &mut Quaternion2, a: &Quaternion2, b: &Quaternion2, t: f32) {
-  let mt=1-tif(dot(a;
-let b)<0)t=-t;
+  let mt=1-Quaternion2::tif(Quaternion2::dot(a, b)<0);
+  let t=-t;
 
   out.0 = a.0 * mt + b.0 * t;
   out.1 = a.1 * mt + b.1 * t;
@@ -823,14 +840,14 @@ let b4=b.4;
 let b5=b.5;
 let b6=b.6;
 let b7=b.7;
-  return (f32::abs(a0 - b0) <= EPSILON * f32::max(1.0, f32::abs(a0), f32::abs(b0)) &&
-    f32::abs(a1 - b1) <= EPSILON * f32::max(1.0, f32::abs(a1), f32::abs(b1)) &&
-    f32::abs(a2 - b2) <= EPSILON * f32::max(1.0, f32::abs(a2), f32::abs(b2)) &&
-    f32::abs(a3 - b3) <= EPSILON * f32::max(1.0, f32::abs(a3), f32::abs(b3)) &&
-    f32::abs(a4 - b4) <= EPSILON * f32::max(1.0, f32::abs(a4), f32::abs(b4)) &&
-    f32::abs(a5 - b5) <= EPSILON * f32::max(1.0, f32::abs(a5), f32::abs(b5)) &&
-    f32::abs(a6 - b6) <= EPSILON * f32::max(1.0, f32::abs(a6), f32::abs(b6)) &&
-    f32::abs(a7 - b7) <= EPSILON * f32::max(1.0, f32::abs(a7), f32::abs(b7)));
+  return (f32::abs(a0 - b0) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a0), f32::abs(b0))) &&
+    f32::abs(a1 - b1) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a1), f32::abs(b1))) &&
+    f32::abs(a2 - b2) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a2), f32::abs(b2))) &&
+    f32::abs(a3 - b3) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a3), f32::abs(b3))) &&
+    f32::abs(a4 - b4) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a4), f32::abs(b4))) &&
+    f32::abs(a5 - b5) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a5), f32::abs(b5))) &&
+    f32::abs(a6 - b6) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a6), f32::abs(b6))) &&
+    f32::abs(a7 - b7) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a7), f32::abs(b7))));
 }
 
 }

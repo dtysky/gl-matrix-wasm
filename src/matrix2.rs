@@ -239,8 +239,12 @@ impl Matrix2 {
    * @returns {mat2} out
    **/
   pub fn scale(out: &mut Matrix2, a: &Matrix2, v: &Vector2) {
-    let a0 = a.0, a1 = a.1, a2 = a.2, a3 = a.3;
-    let v0 = v.0, v1 = v.1;
+    let a0 = a.0;
+    let a1 = a.1;
+    let a2 = a.2;
+    let a3 = a.3;
+    let v0 = v.0;
+    let v1 = v.1;
     out.0 = a0 * v0;
     out.1 = a1 * v0;
     out.2 = a2 * v1;
@@ -280,8 +284,8 @@ impl Matrix2 {
    */
   pub fn fromScaling(out: &mut Matrix2, v: &Vector2) {
     out.0 = v.0;
-    out.1 = 0;
-    out.2 = 0;
+    out.1 = 0.;
+    out.2 = 0.;
     out.3 = v.1; 
   }
 
@@ -291,9 +295,9 @@ impl Matrix2 {
    * @param {mat2} a matrix to represent as a string
    * @returns {String} string representation of the matrix
    */
-  pub fn str(a: &Matrix2) -> String {
-    "mat2(" + a.0 + ", " + a.1 + ", " + a.2 + ", " + a.3 + ")"
-  }
+//   pub fn str(a: &Matrix2) -> String {
+//     "mat2(" + a.0 + ", " + a.1 + ", " + a.2 + ", " + a.3 + ")"
+//   }
 
   /**
    * Returns Frobenius norm of a mat2

@@ -60,7 +60,7 @@ pub struct ${name}(
 );
 
 #[wasm_bindgen]
-impl Matrix2 {
+impl ${name} {
   #[wasm_bindgen(getter)]
   pub fn elements(&self) -> Box<[f32]> {
     Box::new([

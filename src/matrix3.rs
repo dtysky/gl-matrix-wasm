@@ -1,6 +1,10 @@
 use wasm_bindgen::prelude::*;
   
 use super::common::*;
+use super::matrix4::*;
+use super::vector2::*;
+use super::quaternion::*;
+use super::matrix2d::*;
 
 #[wasm_bindgen]
 pub struct Matrix3(
@@ -16,7 +20,7 @@ pub f32
 );
 
 #[wasm_bindgen]
-impl Matrix2 {
+impl Matrix3 {
   #[wasm_bindgen(getter)]
   pub fn elements(&self) -> Box<[f32]> {
     Box::new([
@@ -147,15 +151,15 @@ pub fn set(out: &mut Matrix3, m00: f32, m01: f32, m02: f32, m10: f32, m11: f32, 
  * @returns {mat3} out
  */
 pub fn identity(out: &mut Matrix3) {
-  out.0 = 1;
-  out.1 = 0;
-  out.2 = 0;
-  out.3 = 0;
-  out.4 = 1;
-  out.5 = 0;
-  out.6 = 0;
-  out.7 = 0;
-  out.8 = 1;
+  out.0 = 1.;
+  out.1 = 0.;
+  out.2 = 0.;
+  out.3 = 0.;
+  out.4 = 1.;
+  out.5 = 0.;
+  out.6 = 0.;
+  out.7 = 0.;
+  out.8 = 1.;
   }
 
 /**
@@ -167,7 +171,7 @@ pub fn identity(out: &mut Matrix3) {
  */
 pub fn transpose(out: &mut Matrix3, a: &Matrix3) {
   // If we are transposing ourselves we can skip a few steps but have to cache some values
-  if (out == a) {
+   if (out as *const Matrix3) == (a as *const Matrix3) {
     let a01=a.1;
 let a02=a.2;
 let a12=a.5;
@@ -216,8 +220,8 @@ let a22=a.8;
   // Calculate the determinant
   let det = a00 * b01 + a01 * b11 + a02 * b21;
 
-  if (!det) {
-    return null;
+  if (det < EPSILON) {
+    return;
   }
   det = 1.0 / det;
 
@@ -267,7 +271,7 @@ let a22=a.8;
  * @param {mat3} a the source matrix
  * @returns {Number} determinant of a
  */
-pub fn determinant(a: &Matrix3) {
+pub fn determinant(a: &Matrix3) -> f32 {
   let a00=a.0;
 let a01=a.1;
 let a02=a.2;
@@ -278,7 +282,7 @@ let a12=a.5;
 let a21=a.7;
 let a22=a.8;
 
-  return a00 * (a22 * a11 - a12 * a21) + a01 * (-a22 * a10 + a12 * a20) + a02 * (a21 * a10 - a11 * a20);
+  a00 * (a22 * a11 - a12 * a21) + a01 * (-a22 * a10 + a12 * a20) + a02 * (a21 * a10 - a11 * a20)
 }
 
 /**
@@ -389,7 +393,7 @@ let c=f32::cos(rad);
   out.6 = a20;
   out.7 = a21;
   out.8 = a22;
-  };
+  }
 
 /**
  * Scales the mat3 by the dimensions in the given vec2
@@ -428,15 +432,15 @@ let y=v.1;
  * @returns {mat3} out
  */
 pub fn fromTranslation(out: &mut Matrix3, v: &Vector2) {
-  out.0 = 1;
-  out.1 = 0;
-  out.2 = 0;
-  out.3 = 0;
-  out.4 = 1;
-  out.5 = 0;
+  out.0 = 1.;
+  out.1 = 0.;
+  out.2 = 0.;
+  out.3 = 0.;
+  out.4 = 1.;
+  out.5 = 0.;
   out.6 = v.0;
   out.7 = v.1;
-  out.8 = 1;
+  out.8 = 1.;
   }
 
 /**
@@ -456,15 +460,15 @@ let c=f32::cos(rad);
 
   out.0 = c;
   out.1 = s;
-  out.2 = 0;
+  out.2 = 0.;
 
   out.3 = -s;
   out.4 = c;
-  out.5 = 0;
+  out.5 = 0.;
 
-  out.6 = 0;
-  out.7 = 0;
-  out.8 = 1;
+  out.6 = 0.;
+  out.7 = 0.;
+  out.8 = 1.;
   }
 
 /**
@@ -480,16 +484,16 @@ let c=f32::cos(rad);
  */
 pub fn fromScaling(out: &mut Matrix3, v: &Vector2) {
   out.0 = v.0;
-  out.1 = 0;
-  out.2 = 0;
+  out.1 = 0.;
+  out.2 = 0.;
 
-  out.3 = 0;
+  out.3 = 0.;
   out.4 = v.1;
-  out.5 = 0;
+  out.5 = 0.;
 
-  out.6 = 0;
-  out.7 = 0;
-  out.8 = 1;
+  out.6 = 0.;
+  out.7 = 0.;
+  out.8 = 1.;
   }
 
 /**
@@ -502,15 +506,15 @@ pub fn fromScaling(out: &mut Matrix3, v: &Vector2) {
 pub fn fromMat2d(out: &mut Matrix3, a: &Matrix2d) {
   out.0 = a.0;
   out.1 = a.1;
-  out.2 = 0;
+  out.2 = 0.;
 
   out.3 = a.2;
   out.4 = a.3;
-  out.5 = 0;
+  out.5 = 0.;
 
   out.6 = a.4;
   out.7 = a.5;
-  out.8 = 1;
+  out.8 = 1.;
   }
 
 /**
@@ -540,17 +544,17 @@ let w=q.3;
   let wy = w * y2;
   let wz = w * z2;
 
-  out.0 = 1 - yy - zz;
+  out.0 = 1. - yy - zz;
   out.3 = yx - wz;
   out.6 = zx + wy;
 
   out.1 = yx + wz;
-  out.4 = 1 - xx - zz;
+  out.4 = 1. - xx - zz;
   out.7 = zy - wx;
 
   out.2 = zx - wy;
   out.5 = zy + wx;
-  out.8 = 1 - xx - yy;
+  out.8 = 1. - xx - yy;
 
   }
 
@@ -596,8 +600,8 @@ let a33=a.15;
   // Calculate the determinant
   let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
-  if (!det) {
-    return null;
+  if (det < EPSILON) {
+    return;
   }
   det = 1.0 / det;
 
@@ -623,16 +627,16 @@ let a33=a.15;
  * @param {number} height Height of gl context
  * @returns {mat3} out
  */
-pub fn projection(out: &mut Matrix3, width: &undefined, height: &undefined) {
-    out.0 = 2 / width;
-    out.1 = 0;
-    out.2 = 0;
-    out.3 = 0;
-    out.4 = -2 / height;
-    out.5 = 0;
-    out.6 = -1;
-    out.7 = 1;
-    out.8 = 1;
+pub fn projection(out: &mut Matrix3, width: f32, height: f32) {
+    out.0 = 2. / width;
+    out.1 = 0.;
+    out.2 = 0.;
+    out.3 = 0.;
+    out.4 = -2. / height;
+    out.5 = 0.;
+    out.6 = -1.;
+    out.7 = 1.;
+    out.8 = 1.;
     }
 
 /**
@@ -641,11 +645,11 @@ pub fn projection(out: &mut Matrix3, width: &undefined, height: &undefined) {
  * @param {mat3} a matrix to represent as a string
  * @returns {String} string representation of the matrix
  */
-pub fn str(a: &Matrix3) {
-  return "mat3(" + a.0 + ", " + a.1 + ", " + a.2 + ", " +
-          a.3 + ", " + a.4 + ", " + a.5 + ", " +
-          a.6 + ", " + a.7 + ", " + a.8 + ")";
-}
+// pub fn str(a: &Matrix3) {
+//   return "mat3(" + a.0 + ", " + a.1 + ", " + a.2 + ", " +
+//           a.3 + ", " + a.4 + ", " + a.5 + ", " +
+//           a.6 + ", " + a.7 + ", " + a.8 + ")";
+// }
 
 /**
  * Returns Frobenius norm of a mat3
@@ -653,8 +657,8 @@ pub fn str(a: &Matrix3) {
  * @param {mat3} a the matrix to calculate Frobenius norm of
  * @returns {Number} Frobenius norm
  */
-pub fn frob(a: &Matrix3) {
-  return(f32::hypot(a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a.8))
+pub fn frob(a: &Matrix3) -> f32 {
+    (a.0.powi(2) + a.1.powi(2) + a.2.powi(2) + a.3.powi(2)+ a.4.powi(2)+ a.5.powi(2) + a.6.powi(2) + a.7.powi(2) + a.8.powi(2)).sqrt()
 }
 
 /**
@@ -747,10 +751,10 @@ pub fn multiplyScalarAndAdd(out: &mut Matrix3, a: &Matrix3, b: &Matrix3, scale: 
  * @param {mat3} b The second matrix.
  * @returns {Boolean} True if the matrices are equal, false otherwise.
  */
-pub fn exactEquals(a: &Matrix3, b: &Matrix3) {
-  return a.0 == b.0 && a.1 == b.1 && a.2 == b.2 &&
+pub fn exactEquals(a: &Matrix3, b: &Matrix3) -> bool {
+  a.0 == b.0 && a.1 == b.1 && a.2 == b.2 &&
          a.3 == b.3 && a.4 == b.4 && a.5 == b.5 &&
-         a.6 == b.6 && a.7 == b.7 && a.8 == b.8;
+         a.6 == b.6 && a.7 == b.7 && a.8 == b.8
 }
 
 /**
@@ -760,7 +764,7 @@ pub fn exactEquals(a: &Matrix3, b: &Matrix3) {
  * @param {mat3} b The second matrix.
  * @returns {Boolean} True if the matrices are equal, false otherwise.
  */
-pub fn equals(a: &Matrix3, b: &Matrix3) {
+pub fn equals(a: &Matrix3, b: &Matrix3) -> bool {
   let a0=a.0;
 let a1=a.1;
 let a2=a.2;
@@ -779,15 +783,15 @@ let b5=b.5;
 let b6=b.6;
 let b7=b.7;
 let b8=b.8;
-  return (f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::abs(a0), f32::abs(b0)) &&
-          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::abs(a1), f32::abs(b1)) &&
-          f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::abs(a2), f32::abs(b2)) &&
-          f32::abs(a3 - b3) <= EPSILON*f32::max(1.0, f32::abs(a3), f32::abs(b3)) &&
-          f32::abs(a4 - b4) <= EPSILON*f32::max(1.0, f32::abs(a4), f32::abs(b4)) &&
-          f32::abs(a5 - b5) <= EPSILON*f32::max(1.0, f32::abs(a5), f32::abs(b5)) &&
-          f32::abs(a6 - b6) <= EPSILON*f32::max(1.0, f32::abs(a6), f32::abs(b6)) &&
-          f32::abs(a7 - b7) <= EPSILON*f32::max(1.0, f32::abs(a7), f32::abs(b7)) &&
-          f32::abs(a8 - b8) <= EPSILON*f32::max(1.0, f32::abs(a8), f32::abs(b8)));
+  f32::abs(a0 - b0) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a0), f32::abs(b0))) &&
+          f32::abs(a1 - b1) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a1), f32::abs(b1))) &&
+          f32::abs(a2 - b2) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a2), f32::abs(b2))) &&
+          f32::abs(a3 - b3) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a3), f32::abs(b3))) &&
+          f32::abs(a4 - b4) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a4), f32::abs(b4))) &&
+          f32::abs(a5 - b5) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a5), f32::abs(b5))) &&
+          f32::abs(a6 - b6) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a6), f32::abs(b6))) &&
+          f32::abs(a7 - b7) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a7), f32::abs(b7))) &&
+          f32::abs(a8 - b8) <= EPSILON*f32::max(1.0, f32::max(f32::abs(a8), f32::abs(b8)))
 }
 
 /**
