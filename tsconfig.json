@@ -9,7 +9,8 @@
     "skipLibCheck": true
   },
   "include": [
-    "lib/**/*.ts",
+    "pkg/**/*.ts",
+    "spec/**/*.ts",
     "demo/**/*.tsx",
     "demo/**/*.ts"
   ]

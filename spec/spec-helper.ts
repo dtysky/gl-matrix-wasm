@@ -1,39 +1,38 @@
 const EPSILON = 0.00001;
 const assert = require('assert');
 
+export function expect(e) {
 
-global.expect = function(e) {
-    
     function expected(e, message, a) {
         assert.fail(e, a, `expected ${JSON.stringify(e)} ${message} ${JSON.stringify(a)}`);
     }
-    
+
     return {
-        toBe: function(a) {
+        toBe: function (a) {
             assert.strictEqual(e, a);
         },
-        toEqual: function(a) {
-            assert.strictEqual(e,a);
+        toEqual: function (a) {
+            assert.strictEqual(e, a);
         },
-        toBeDefined: function() {
+        toBeDefined: function () {
             assert.notStrictEqual(e, undefined);
         },
-        toBeTruthy: function() {
+        toBeTruthy: function () {
             assert(e);
         },
-        toBeFalsy: function() {
+        toBeFalsy: function () {
             assert(!e);
         },
-        toBeNull: function() {
+        toBeNull: function () {
             assert.strictEqual(e, null);
         },
         not: {
-            toBe: function(a) {
+            toBe: function (a) {
                 assert.notStrictEqual(e, a);
             },
-            
-            toBeEqualish: function(a) {
-                if (typeof(e) == 'number')
+
+            toBeEqualish: function (a) {
+                if (typeof (e) == 'number')
                     assert(Math.abs(e - a) >= EPSILON);
 
                 e = e.elements;
@@ -46,15 +45,15 @@ global.expect = function(e) {
                     if (Math.abs(e[i] - a[i]) >= EPSILON)
                         return;
                 }
-                
+
                 assert.fail(e, a);
             }
-            
+
         },
-        toBeGreaterThan: function(a) {
+        toBeGreaterThan: function (a) {
             assert(e > a);
         },
-        toBeLessThan: function(a) {
+        toBeLessThan: function (a) {
             assert(e < a);
         },
         /*
@@ -63,43 +62,54 @@ global.expect = function(e) {
            This is a way to check for "equal enough" conditions, as a way
            of working around floating point imprecision.
          */
-        toBeEqualish: function(a) {
-
-            if (typeof(e) == 'number') {
-                if(isNaN(e) !== isNaN(a))
+        toBeEqualish: function (a) {
+            if (typeof (e) == 'number') {
+                if (isNaN(e) !== isNaN(a))
                     expected(e, "to be equalish to", a);
-                if(Math.abs(e - a) >= EPSILON)
+                if (Math.abs(e - a) >= EPSILON)
                     expected(e, "to be equalish to", a);
             }
 
-            e = e.elements;
-            a = a.elements;
+            if (e.ptr) {
+                e = e.elements;
+            }
+            if (a.ptr) {
+                a = a.elements;
+            }
             if (e.length != a.length)
                 assert.fail(e.length, a.length, "length mismatch");
 
 
             for (let i = 0; i < e.length; i++) {
-                if (isNaN(e[i]) !== isNaN(a[i]))
+                if (isNaN(e[i]) !== isNaN(a[i])) {
+                    console.log('failed');
                     assert.fail(isNaN(e[i]), isNaN(a[i]));
-                if (Math.abs(e[i] - a[i]) >= EPSILON)
+                }
+                if (Math.abs(e[i] - a[i]) >= EPSILON) {
+                    console.log('failed');
                     assert.fail(Math.abs(e[i] - a[i]));
+                }
             }
         },
-        
+
         //Dual quaternions are very special & unique snowflakes
-        toBeEqualishQuat2: function(a, epsilon) {
-            if(epsilon == undefined) epsilon = EPSILON;
+        toBeEqualishQuat2: function (a, epsilon) {
+            if (epsilon == undefined) epsilon = EPSILON;
             let allSignsFlipped = false;
             if (e.length != a.length)
                 expected(e, "to have the same length as", a);
 
-            e = e.elements;
-            a = a.elements;
-                
+            if (e.ptr) {
+                e = e.elements;
+            }
+            if (a.ptr) {
+                a = a.elements;
+            }
+
             for (let i = 0; i < e.length; i++) {
                 if (isNaN(e[i]) !== isNaN(a[i]))
                     expected(e, "to be equalish to", a);
-                
+
                 if (allSignsFlipped) {
                     if (Math.abs(e[i] - (-a[i])) >= epsilon)
                         expected(e, "to be equalish to", a);

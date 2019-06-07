@@ -8,6 +8,7 @@ bin
 .vscode
 convert/rust
 lib
+reports
 
 /target
 **/*.rs.bk

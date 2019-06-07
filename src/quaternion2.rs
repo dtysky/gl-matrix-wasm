@@ -495,16 +495,12 @@ impl Quaternion2 {
         out.7 = a.7;
     }
 
-    pub fn length(a: &Quaternion2) -> f32 {
+    pub fn len(a: &Quaternion2) -> f32 {
         let x = a.0;
         let y = a.1;
         let z = a.2;
         let w = a.3;
         (x.powi(2) + y.powi(2) + z.powi(2) + w.powi(2)).sqrt()
-    }
-
-    pub fn len(a: &Quaternion2) -> f32 {
-        Quaternion2::length(a)
     }
 
     pub fn squaredLength(a: &Quaternion2) -> f32 {

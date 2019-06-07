@@ -29,7 +29,7 @@ impl Vector3 {
         Vector3(a.0, a.1, a.2)
     }
 
-    pub fn length(a: &Vector3) -> f32 {
+    pub fn len(a: &Vector3) -> f32 {
         let x = a.0;
         let y = a.1;
         let z = a.2;
@@ -404,10 +404,6 @@ impl Vector3 {
 
     pub fn sqrDist(a: &Vector3, b: &Vector3) {
         Vector3::squaredDistance(a, b);
-    }
-
-    pub fn len(a: &Vector3) -> f32 {
-        Vector3::length(a)
     }
 
     pub fn sqrLen(a: &Vector3) -> f32 {

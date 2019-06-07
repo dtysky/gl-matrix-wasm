@@ -139,7 +139,7 @@ impl Vector4 {
         x * x + y * y + z * z + w * w
     }
 
-    pub fn length(a: &Vector4) -> f32 {
+    pub fn len(a: &Vector4) -> f32 {
         let x = a.0;
         let y = a.1;
         let z = a.2;
@@ -335,10 +335,6 @@ impl Vector4 {
 
     pub fn sqrDist(a: &Vector4, b: &Vector4) -> f32 {
         Vector4::squaredDistance(a, b)
-    }
-
-    pub fn len(a: &Vector4) -> f32 {
-        Vector4::length(a)
     }
 
     pub fn sqrLen(a: &Vector4) -> f32 {

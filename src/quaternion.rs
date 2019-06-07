@@ -353,16 +353,12 @@ impl Quaternion {
         out.3 = aw + t * (b.3 - aw);
     }
 
-    pub fn length(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> f32 {
+    pub fn len(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> f32 {
         let x = a.0;
         let y = a.1;
         let z = a.2;
         let w = a.3;
         (x.powi(2) + y.powi(2) + z.powi(2) + w.powi(2)).sqrt()
-    }
-
-    pub fn len(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-        Quaternion::length(out, a, b);
     }
 
     pub fn squaredLength(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> f32 {

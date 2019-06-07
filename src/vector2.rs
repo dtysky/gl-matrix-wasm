@@ -112,7 +112,7 @@ impl Vector2 {
         x * x + y * y
     }
 
-    pub fn length(a: &Vector2) -> f32 {
+    pub fn len(a: &Vector2) -> f32 {
         let x = a.0;
         let y = a.1;
         f32::hypot(x, y)
@@ -265,10 +265,6 @@ impl Vector2 {
         let b1 = b.1;
         f32::abs(a0 - b0) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a0), f32::abs(b0)))
             && f32::abs(a1 - b1) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a1), f32::abs(b1)))
-    }
-
-    pub fn len(a: &Vector2) -> f32 {
-        Vector2::length(a)
     }
 
     pub fn sub(out: &mut Vector2, a: &Vector2, b: &Vector2) {
