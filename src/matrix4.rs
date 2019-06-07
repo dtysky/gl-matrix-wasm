@@ -1,3 +1,9 @@
+/**
+ * @File   : matrix4.rs
+ * @Author : dtysky (dtysky@outlook.com)
+ * @Link   : http://dtysky.moe
+ * @Date   : 2019/2/7 下午9:53:03
+ */
 use wasm_bindgen::prelude::*;
 
 use super::common::*;
@@ -35,41 +41,18 @@ impl Matrix4 {
         ])
     }
 
-    /**
-     * 4x4 Matrix<br>Format: column-major, when typed out it looks like row-major<br>The matrices are being post multiplied.
-     * @module mat4
-     */
-
-    /**
-     * Creates a new identity mat4
-     *
-     * @returns {mat4} a new 4x4 matrix
-     */
     pub fn create() -> Matrix4 {
         Matrix4(
             1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.,
         )
     }
 
-    /**
-     * Creates a new mat4 initialized with values from an existing matrix
-     *
-     * @param {mat4} a matrix to clone
-     * @returns {mat4} a new 4x4 matrix
-     */
     pub fn clone(a: &Matrix4) -> Matrix4 {
         Matrix4(
             a.0, a.1, a.2, a.3, a.4, a.5, a.6, a.7, a.8, a.9, a.10, a.11, a.12, a.13, a.14, a.15,
         )
     }
 
-    /**
-     * Copy the values from one mat4 to another
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the source matrix
-     * @returns {mat4} out
-     */
     pub fn copy(out: &mut Matrix4, a: &Matrix4) {
         out.0 = a.0;
         out.1 = a.1;
@@ -89,27 +72,6 @@ impl Matrix4 {
         out.15 = a.15;
     }
 
-    /**
-     * Create a new mat4 with the given values
-     *
-     * @param {Number} m00 Component in column 0, row 0 position (index 0)
-     * @param {Number} m01 Component in column 0, row 1 position (index 1)
-     * @param {Number} m02 Component in column 0, row 2 position (index 2)
-     * @param {Number} m03 Component in column 0, row 3 position (index 3)
-     * @param {Number} m10 Component in column 1, row 0 position (index 4)
-     * @param {Number} m11 Component in column 1, row 1 position (index 5)
-     * @param {Number} m12 Component in column 1, row 2 position (index 6)
-     * @param {Number} m13 Component in column 1, row 3 position (index 7)
-     * @param {Number} m20 Component in column 2, row 0 position (index 8)
-     * @param {Number} m21 Component in column 2, row 1 position (index 9)
-     * @param {Number} m22 Component in column 2, row 2 position (index 10)
-     * @param {Number} m23 Component in column 2, row 3 position (index 11)
-     * @param {Number} m30 Component in column 3, row 0 position (index 12)
-     * @param {Number} m31 Component in column 3, row 1 position (index 13)
-     * @param {Number} m32 Component in column 3, row 2 position (index 14)
-     * @param {Number} m33 Component in column 3, row 3 position (index 15)
-     * @returns {mat4} A new mat4
-     */
     pub fn fromValues(
         m00: f32,
         m01: f32,
@@ -133,28 +95,6 @@ impl Matrix4 {
         )
     }
 
-    /**
-     * Set the components of a mat4 to the given values
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {Number} m00 Component in column 0, row 0 position (index 0)
-     * @param {Number} m01 Component in column 0, row 1 position (index 1)
-     * @param {Number} m02 Component in column 0, row 2 position (index 2)
-     * @param {Number} m03 Component in column 0, row 3 position (index 3)
-     * @param {Number} m10 Component in column 1, row 0 position (index 4)
-     * @param {Number} m11 Component in column 1, row 1 position (index 5)
-     * @param {Number} m12 Component in column 1, row 2 position (index 6)
-     * @param {Number} m13 Component in column 1, row 3 position (index 7)
-     * @param {Number} m20 Component in column 2, row 0 position (index 8)
-     * @param {Number} m21 Component in column 2, row 1 position (index 9)
-     * @param {Number} m22 Component in column 2, row 2 position (index 10)
-     * @param {Number} m23 Component in column 2, row 3 position (index 11)
-     * @param {Number} m30 Component in column 3, row 0 position (index 12)
-     * @param {Number} m31 Component in column 3, row 1 position (index 13)
-     * @param {Number} m32 Component in column 3, row 2 position (index 14)
-     * @param {Number} m33 Component in column 3, row 3 position (index 15)
-     * @returns {mat4} out
-     */
     pub fn set(
         out: &mut Matrix4,
         m00: f32,
@@ -192,12 +132,6 @@ impl Matrix4 {
         out.15 = m33;
     }
 
-    /**
-     * Set a mat4 to the identity matrix
-     *
-     * @param {mat4} out the receiving matrix
-     * @returns {mat4} out
-     */
     pub fn identity(out: &mut Matrix4) {
         out.0 = 1.;
         out.1 = 0.;
@@ -217,13 +151,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Transpose the values of a mat4
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the source matrix
-     * @returns {mat4} out
-     */
     pub fn transpose(out: &mut Matrix4, a: &Matrix4) {
         // If we are transposing ourselves we can skip a few steps but have to cache some values
         if (out as *const Matrix4) == (a as *const Matrix4) {
@@ -266,13 +193,6 @@ impl Matrix4 {
         }
     }
 
-    /**
-     * Inverts a mat4
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the source matrix
-     * @returns {mat4} out
-     */
     pub fn invert(out: &mut Matrix4, a: &Matrix4) {
         let a00 = a.0;
         let a01 = a.1;
@@ -330,13 +250,6 @@ impl Matrix4 {
         out.15 = (a20 * b03 - a21 * b01 + a22 * b00) * det;
     }
 
-    /**
-     * Calculates the adjugate of a mat4
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the source matrix
-     * @returns {mat4} out
-     */
     pub fn adjoint(out: &mut Matrix4, a: &Matrix4) {
         let a00 = a.0;
         let a01 = a.1;
@@ -389,12 +302,6 @@ impl Matrix4 {
             + a20 * (a01 * a12 - a02 * a11));
     }
 
-    /**
-     * Calculates the determinant of a mat4
-     *
-     * @param {mat4} a the source matrix
-     * @returns {Number} determinant of a
-     */
     pub fn determinant(a: &Matrix4) -> f32 {
         let a00 = a.0;
         let a01 = a.1;
@@ -430,14 +337,6 @@ impl Matrix4 {
         b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
     }
 
-    /**
-     * Multiplies two mat4s
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the first operand
-     * @param {mat4} b the second operand
-     * @returns {mat4} out
-     */
     pub fn multiply(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
         let a00 = a.0;
         let a01 = a.1;
@@ -494,14 +393,6 @@ impl Matrix4 {
         out.15 = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
     }
 
-    /**
-     * Translate a mat4 by the given vector
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the matrix to translate
-     * @param {vec3} v vector to translate by
-     * @returns {mat4} out
-     */
     pub fn translate(out: &mut Matrix4, a: &Matrix4, v: &Vector3) {
         let x = v.0;
         let y = v.1;
@@ -546,14 +437,6 @@ impl Matrix4 {
         }
     }
 
-    /**
-     * Scales the mat4 by the dimensions in the given vec3 not using vectorization
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the matrix to scale
-     * @param {vec3} v the vec3 to scale the matrix by
-     * @returns {mat4} out
-     **/
     pub fn scale(out: &mut Matrix4, a: &Matrix4, v: &Vector3) {
         let x = v.0;
         let y = v.1;
@@ -577,15 +460,6 @@ impl Matrix4 {
         out.15 = a.15;
     }
 
-    /**
-     * Rotates a mat4 by the given angle around the given axis
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the matrix to rotate
-     * @param {Number} rad the angle to rotate the matrix by
-     * @param {vec3} axis the axis to rotate around
-     * @returns {mat4} out
-     */
     pub fn rotate(out: &mut Matrix4, a: &Matrix4, rad: f32, axis: &Vector3) {
         let mut x = axis.0;
         let mut y = axis.1;
@@ -652,14 +526,6 @@ impl Matrix4 {
         }
     }
 
-    /**
-     * Rotates a matrix by the given angle around the X axis
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the matrix to rotate
-     * @param {Number} rad the angle to rotate the matrix by
-     * @returns {mat4} out
-     */
     pub fn rotateX(out: &mut Matrix4, a: &Matrix4, rad: f32) {
         let s = f32::sin(rad);
         let c = f32::cos(rad);
@@ -693,14 +559,6 @@ impl Matrix4 {
         out.11 = a23 * c - a13 * s;
     }
 
-    /**
-     * Rotates a matrix by the given angle around the Y axis
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the matrix to rotate
-     * @param {Number} rad the angle to rotate the matrix by
-     * @returns {mat4} out
-     */
     pub fn rotateY(out: &mut Matrix4, a: &Matrix4, rad: f32) {
         let s = f32::sin(rad);
         let c = f32::cos(rad);
@@ -734,14 +592,6 @@ impl Matrix4 {
         out.11 = a03 * s + a23 * c;
     }
 
-    /**
-     * Rotates a matrix by the given angle around the Z axis
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the matrix to rotate
-     * @param {Number} rad the angle to rotate the matrix by
-     * @returns {mat4} out
-     */
     pub fn rotateZ(out: &mut Matrix4, a: &Matrix4, rad: f32) {
         let s = f32::sin(rad);
         let c = f32::cos(rad);
@@ -775,17 +625,6 @@ impl Matrix4 {
         out.7 = a13 * c - a03 * s;
     }
 
-    /**
-     * Creates a matrix from a vector translation
-     * This is equivalent to (but much faster than):
-     *
-     *     mat4.identity(dest);
-     *     mat4.translate(dest, dest, vec);
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {vec3} v Translation vector
-     * @returns {mat4} out
-     */
     pub fn fromTranslation(out: &mut Matrix4, v: &Vector3) {
         out.0 = 1.;
         out.1 = 0.;
@@ -805,17 +644,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Creates a matrix from a vector scaling
-     * This is equivalent to (but much faster than):
-     *
-     *     mat4.identity(dest);
-     *     mat4.scale(dest, dest, vec);
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {vec3} v Scaling vector
-     * @returns {mat4} out
-     */
     pub fn fromScaling(out: &mut Matrix4, v: &Vector3) {
         out.0 = v.0;
         out.1 = 0.;
@@ -835,18 +663,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Creates a matrix from a given angle around a given axis
-     * This is equivalent to (but much faster than):
-     *
-     *     mat4.identity(dest);
-     *     mat4.rotate(dest, dest, rad, axis);
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {Number} rad the angle to rotate the matrix by
-     * @param {vec3} axis the axis to rotate around
-     * @returns {mat4} out
-     */
     pub fn fromRotation(out: &mut Matrix4, rad: f32, axis: &Vector3) {
         let mut x = axis.0;
         let mut y = axis.1;
@@ -885,17 +701,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Creates a matrix from the given angle around the X axis
-     * This is equivalent to (but much faster than):
-     *
-     *     mat4.identity(dest);
-     *     mat4.rotateX(dest, dest, rad);
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {Number} rad the angle to rotate the matrix by
-     * @returns {mat4} out
-     */
     pub fn fromXRotation(out: &mut Matrix4, rad: f32) {
         let s = f32::sin(rad);
         let c = f32::cos(rad);
@@ -919,17 +724,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Creates a matrix from the given angle around the Y axis
-     * This is equivalent to (but much faster than):
-     *
-     *     mat4.identity(dest);
-     *     mat4.rotateY(dest, dest, rad);
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {Number} rad the angle to rotate the matrix by
-     * @returns {mat4} out
-     */
     pub fn fromYRotation(out: &mut Matrix4, rad: f32) {
         let s = f32::sin(rad);
         let c = f32::cos(rad);
@@ -953,17 +747,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Creates a matrix from the given angle around the Z axis
-     * This is equivalent to (but much faster than):
-     *
-     *     mat4.identity(dest);
-     *     mat4.rotateZ(dest, dest, rad);
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {Number} rad the angle to rotate the matrix by
-     * @returns {mat4} out
-     */
     pub fn fromZRotation(out: &mut Matrix4, rad: f32) {
         let s = f32::sin(rad);
         let c = f32::cos(rad);
@@ -987,21 +770,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Creates a matrix from a quaternion rotation and vector translation
-     * This is equivalent to (but much faster than):
-     *
-     *     mat4.identity(dest);
-     *     mat4.translate(dest, vec);
-     *     let quatMat = mat4.create();
-     *     quat4.toMat4(quat, quatMat);
-     *     mat4.multiply(dest, quatMat);
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {quat4} q Rotation quaternion
-     * @param {vec3} v Translation vector
-     * @returns {mat4} out
-     */
     pub fn fromRotationTranslation(out: &mut Matrix4, q: &Quaternion, v: &Vector3) {
         // Quaternion math
         let x = q.0;
@@ -1040,13 +808,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Creates a new mat4 from a dual quat.
-     *
-     * @param {mat4} out Matrix
-     * @param {quat2} a Dual Quaternion
-     * @returns {mat4} mat4 receiving operation result
-     */
     pub fn fromQuat2(out: &mut Matrix4, a: &Quaternion2) {
         let translation = &mut Vector3::create();
         let bx = -a.0;
@@ -1076,31 +837,12 @@ impl Matrix4 {
         );
     }
 
-    /**
-     * Returns the translation vector component of a transformation
-     *  matrix. If a matrix is built with fromRotationTranslation,
-     *  the returned vector will be the same as the translation vector
-     *  originally supplied.
-     * @param  {vec3} out Vector to receive translation component
-     * @param  {mat4} mat Matrix to be decomposed (input)
-     * @return {vec3} out
-     */
     pub fn getTranslation(out: &mut Vector3, mat: &Matrix4) {
         out.0 = mat.12;
         out.1 = mat.13;
         out.2 = mat.14;
     }
 
-    /**
-     * Returns the scaling factor component of a transformation
-     *  matrix. If a matrix is built with fromRotationTranslationScale
-     *  with a normalized Quaternion paramter, the returned vector will be
-     *  the same as the scaling vector
-     *  originally supplied.
-     * @param  {vec3} out Vector to receive scaling factor component
-     * @param  {mat4} mat Matrix to be decomposed (input)
-     * @return {vec3} out
-     */
     pub fn getScaling(out: &mut Vector3, mat: &Matrix4) {
         let m11 = mat.0;
         let m12 = mat.1;
@@ -1116,15 +858,6 @@ impl Matrix4 {
         out.2 = (m31.powi(2) + m32.powi(2) + m33.powi(2)).sqrt();
     }
 
-    /**
-     * Returns a quaternion representing the rotational component
-     *  of a transformation matrix. If a matrix is built with
-     *  fromRotationTranslation, the returned quaternion will be the
-     *  same as the quaternion originally supplied.
-     * @param {quat} out Quaternion to receive the rotation component
-     * @param {mat4} mat Matrix to be decomposed (input)
-     * @return {quat} out
-     */
     pub fn getRotation(out: &mut Quaternion, mat: &Matrix4) {
         let scaling = &mut Vector3::create();
         Matrix4::getScaling(scaling, mat);
@@ -1172,23 +905,6 @@ impl Matrix4 {
         }
     }
 
-    /**
-     * Creates a matrix from a quaternion rotation, vector translation and vector scale
-     * This is equivalent to (but much faster than):
-     *
-     *     mat4.identity(dest);
-     *     mat4.translate(dest, vec);
-     *     let quatMat = mat4.create();
-     *     quat4.toMat4(quat, quatMat);
-     *     mat4.multiply(dest, quatMat);
-     *     mat4.scale(dest, scale)
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {quat4} q Rotation quaternion
-     * @param {vec3} v Translation vector
-     * @param {vec3} s Scaling vector
-     * @returns {mat4} out
-     */
     pub fn fromRotationTranslationScale(
         out: &mut Matrix4,
         q: &Quaternion,
@@ -1235,26 +951,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Creates a matrix from a quaternion rotation, vector translation and vector scale, rotating and scaling around the given origin
-     * This is equivalent to (but much faster than):
-     *
-     *     mat4.identity(dest);
-     *     mat4.translate(dest, vec);
-     *     mat4.translate(dest, origin);
-     *     let quatMat = mat4.create();
-     *     quat4.toMat4(quat, quatMat);
-     *     mat4.multiply(dest, quatMat);
-     *     mat4.scale(dest, scale)
-     *     mat4.translate(dest, negativeOrigin);
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {quat4} q Rotation quaternion
-     * @param {vec3} v Translation vector
-     * @param {vec3} s Scaling vector
-     * @param {vec3} o The origin vector around which to scale and rotate
-     * @returns {mat4} out
-     */
     pub fn fromRotationTranslationScaleOrigin(
         out: &mut Matrix4,
         q: &Quaternion,
@@ -1317,14 +1013,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Calculates a 4x4 matrix from the given quaternion
-     *
-     * @param {mat4} out mat4 receiving operation result
-     * @param {quat} q Quaternion to create matrix from
-     *
-     * @returns {mat4} out
-     */
     pub fn fromQuat(out: &mut Matrix4, q: &Quaternion) {
         let x = q.0;
         let y = q.1;
@@ -1365,18 +1053,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Generates a frustum matrix with the given bounds
-     *
-     * @param {mat4} out mat4 frustum matrix will be written into
-     * @param {Number} left Left bound of the frustum
-     * @param {Number} right Right bound of the frustum
-     * @param {Number} bottom Bottom bound of the frustum
-     * @param {Number} top Top bound of the frustum
-     * @param {Number} near Near bound of the frustum
-     * @param {Number} far Far bound of the frustum
-     * @returns {mat4} out
-     */
     pub fn frustum(
         out: &mut Matrix4,
         left: f32,
@@ -1407,17 +1083,6 @@ impl Matrix4 {
         out.15 = 0.;
     }
 
-    /**
-     * Generates a perspective projection matrix with the given bounds.
-     * Passing null/undefined/no value for far will generate infinite projection matrix.
-     *
-     * @param {mat4} out mat4 frustum matrix will be written into
-     * @param {number} fovy Vertical field of view in radians
-     * @param {number} aspect Aspect ratio. typically viewport width/height
-     * @param {number} near Near bound of the frustum
-     * @param {number} far Far bound of the frustum, can be null or Infinity
-     * @returns {mat4} out
-     */
     pub fn perspective(out: &mut Matrix4, fovy: f32, aspect: f32, near: f32, far: f32) {
         let f = 1.0 / f32::tan(fovy / 2.);
         let nf;
@@ -1445,17 +1110,6 @@ impl Matrix4 {
         //   }
     }
 
-    /**
-     * Generates a perspective projection matrix with the given field of view.
-     * This is primarily useful for generating projection matrices to be used
-     * with the still experiemental WebVR API.
-     *
-     * @param {mat4} out mat4 frustum matrix will be written into
-     * @param {Object} fov Object containing the following values: upDegrees, downDegrees, leftDegrees, rightDegrees
-     * @param {number} near Near bound of the frustum
-     * @param {number} far Far bound of the frustum
-     * @returns {mat4} out
-     */
     // pub fn perspectiveFromFieldOfView(out: &mut Matrix4, fov: f32, near: f32, far: f32) {
     //   let upTan = f32::tan(fov.upDegrees * PI/180.0);
     //   let downTan = f32::tan(fov.downDegrees * PI/180.0);
@@ -1482,18 +1136,6 @@ impl Matrix4 {
     //   out.15 = 0.0;
     //   }
 
-    /**
-     * Generates a orthogonal projection matrix with the given bounds
-     *
-     * @param {mat4} out mat4 frustum matrix will be written into
-     * @param {number} left Left bound of the frustum
-     * @param {number} right Right bound of the frustum
-     * @param {number} bottom Bottom bound of the frustum
-     * @param {number} top Top bound of the frustum
-     * @param {number} near Near bound of the frustum
-     * @param {number} far Far bound of the frustum
-     * @returns {mat4} out
-     */
     pub fn ortho(
         out: &mut Matrix4,
         left: f32,
@@ -1524,16 +1166,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Generates a look-at matrix with the given eye position, focal point, and up axis.
-     * If you want a matrix that actually makes an object look at another object, you should use targetTo instead.
-     *
-     * @param {mat4} out mat4 frustum matrix will be written into
-     * @param {vec3} eye Position of the viewer
-     * @param {vec3} center Point the viewer is looking at
-     * @param {vec3} up vec3 pointing up
-     * @returns {mat4} out
-     */
     pub fn lookAt(out: &mut Matrix4, eye: &Vector3, center: &Vector3, up: &Vector3) {
         let eyex = eye.0;
         let eyey = eye.1;
@@ -1611,15 +1243,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Generates a matrix that makes something look at something else.
-     *
-     * @param {mat4} out mat4 frustum matrix will be written into
-     * @param {vec3} eye Position of the viewer
-     * @param {vec3} center Point the viewer is looking at
-     * @param {vec3} up vec3 pointing up
-     * @returns {mat4} out
-     */
     pub fn targetTo(out: &mut Matrix4, eye: &Vector3, target: &Vector3, up: &Vector3) {
         let eyex = eye.0;
         let eyey = eye.1;
@@ -1670,12 +1293,6 @@ impl Matrix4 {
         out.15 = 1.;
     }
 
-    /**
-     * Returns a string representation of a mat4
-     *
-     * @param {mat4} a matrix to represent as a string
-     * @returns {String} string representation of the matrix
-     */
     // pub fn str(a: &Matrix4) {
     //   return "mat4(" + a.0 + ", " + a.1 + ", " + a.2 + ", " + a.3 + ", " +
     //           a.4 + ", " + a.5 + ", " + a.6 + ", " + a.7 + ", " +
@@ -1683,12 +1300,6 @@ impl Matrix4 {
     //           a.12 + ", " + a.13 + ", " + a.14 + ", " + a.15 + ")";
     // }
 
-    /**
-     * Returns Frobenius norm of a mat4
-     *
-     * @param {mat4} a the matrix to calculate Frobenius norm of
-     * @returns {Number} Frobenius norm
-     */
     pub fn frob(a: &Matrix4) -> f32 {
         (a.0.powi(2)
             + a.1.powi(2)
@@ -1709,14 +1320,6 @@ impl Matrix4 {
         .sqrt()
     }
 
-    /**
-     * Adds two mat4"s
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the first operand
-     * @param {mat4} b the second operand
-     * @returns {mat4} out
-     */
     pub fn add(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
         out.0 = a.0 + b.0;
         out.1 = a.1 + b.1;
@@ -1736,14 +1339,6 @@ impl Matrix4 {
         out.15 = a.15 + b.15;
     }
 
-    /**
-     * Subtracts matrix b from matrix a
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the first operand
-     * @param {mat4} b the second operand
-     * @returns {mat4} out
-     */
     pub fn subtract(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
         out.0 = a.0 - b.0;
         out.1 = a.1 - b.1;
@@ -1763,14 +1358,6 @@ impl Matrix4 {
         out.15 = a.15 - b.15;
     }
 
-    /**
-     * Multiply each element of the matrix by a scalar.
-     *
-     * @param {mat4} out the receiving matrix
-     * @param {mat4} a the matrix to scale
-     * @param {Number} b amount to scale the matrix"s elements by
-     * @returns {mat4} out
-     */
     pub fn multiplyScalar(out: &mut Matrix4, a: &Matrix4, b: f32) {
         out.0 = a.0 * b;
         out.1 = a.1 * b;
@@ -1790,15 +1377,6 @@ impl Matrix4 {
         out.15 = a.15 * b;
     }
 
-    /**
-     * Adds two mat4"s after multiplying each element of the second operand by a scalar value.
-     *
-     * @param {mat4} out the receiving vector
-     * @param {mat4} a the first operand
-     * @param {mat4} b the second operand
-     * @param {Number} scale the amount to scale b"s elements by before adding
-     * @returns {mat4} out
-     */
     pub fn multiplyScalarAndAdd(out: &mut Matrix4, a: &Matrix4, b: &Matrix4, scale: f32) {
         out.0 = a.0 + (b.0 * scale);
         out.1 = a.1 + (b.1 * scale);
@@ -1818,13 +1396,6 @@ impl Matrix4 {
         out.15 = a.15 + (b.15 * scale);
     }
 
-    /**
-     * Returns whether or not the matrices have exactly the same elements in the same position (when compared with ==)
-     *
-     * @param {mat4} a The first matrix.
-     * @param {mat4} b The second matrix.
-     * @returns {Boolean} True if the matrices are equal, false otherwise.
-     */
     pub fn exactEquals(a: &Matrix4, b: &Matrix4) -> bool {
         a.0 == b.0
             && a.1 == b.1
@@ -1844,13 +1415,6 @@ impl Matrix4 {
             && a.15 == b.15
     }
 
-    /**
-     * Returns whether or not the matrices have approximately the same elements in the same position.
-     *
-     * @param {mat4} a The first matrix.
-     * @param {mat4} b The second matrix.
-     * @returns {Boolean} True if the matrices are equal, false otherwise.
-     */
     pub fn equals(a: &Matrix4, b: &Matrix4) -> bool {
         let a0 = a.0;
         let a1 = a.1;
@@ -1910,18 +1474,10 @@ impl Matrix4 {
                 <= EPSILON * f32::max(1.0, f32::max(f32::abs(a15), f32::abs(b15)))
     }
 
-    /**
-     * Alias for {@link mat4.multiply}
-     * @function
-     */
     pub fn mul(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
         Matrix4::multiply(out, a, b);
     }
 
-    /**
-     * Alias for {@link mat4.subtract}
-     * @function
-     */
     pub fn sub(out: &mut Matrix4, a: &Matrix4, b: &Matrix4) {
         Matrix4::subtract(out, a, b);
     }

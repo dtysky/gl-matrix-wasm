@@ -1,8 +1,8 @@
 /**
  * @File   : common.rs
  * @Author : dtysky (dtysky@outlook.com)
- * @Date   : 6/6/2019, 5:41:09 PM
- * @Description:
+ * @Link   : http://dtysky.moe
+ * @Date   : 2019/2/7 下午9:53:03
  */
 use wasm_bindgen::prelude::*;
 

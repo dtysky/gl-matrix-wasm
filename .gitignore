@@ -7,6 +7,7 @@ pkg
 bin
 .vscode
 convert/rust
+lib
 
 /target
 **/*.rs.bk

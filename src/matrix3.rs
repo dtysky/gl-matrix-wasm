@@ -1,3 +1,9 @@
+/**
+ * @File   : matrix3.rs
+ * @Author : dtysky (dtysky@outlook.com)
+ * @Link   : http://dtysky.moe
+ * @Date   : 2019/2/7 下午9:53:03
+ */
 use wasm_bindgen::prelude::*;
 
 use super::common::*;
@@ -28,27 +34,10 @@ impl Matrix3 {
         ])
     }
 
-    /**
-     * 3x3 Matrix
-     * @module mat3
-     */
-
-    /**
-     * Creates a new identity mat3
-     *
-     * @returns {mat3} a new 3x3 matrix
-     */
     pub fn create() -> Matrix3 {
         Matrix3(1., 0., 0., 0., 1., 0., 0., 0., 1.)
     }
 
-    /**
-     * Copies the upper-left 3x3 values into the given mat3.
-     *
-     * @param {mat3} out the receiving 3x3 matrix
-     * @param {mat4} a   the source 4x4 matrix
-     * @returns {mat3} out
-     */
     pub fn fromMat4(out: &mut Matrix3, a: &Matrix4) {
         out.0 = a.0;
         out.1 = a.1;
@@ -61,23 +50,10 @@ impl Matrix3 {
         out.8 = a.10;
     }
 
-    /**
-     * Creates a new mat3 initialized with values from an existing matrix
-     *
-     * @param {mat3} a matrix to clone
-     * @returns {mat3} a new 3x3 matrix
-     */
     pub fn clone(a: &Matrix3) -> Matrix3 {
         Matrix3(a.0, a.1, a.2, a.3, a.4, a.5, a.6, a.7, a.8)
     }
 
-    /**
-     * Copy the values from one mat3 to another
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the source matrix
-     * @returns {mat3} out
-     */
     pub fn copy(out: &mut Matrix3, a: &Matrix3) {
         out.0 = a.0;
         out.1 = a.1;
@@ -90,20 +66,6 @@ impl Matrix3 {
         out.8 = a.8;
     }
 
-    /**
-     * Create a new mat3 with the given values
-     *
-     * @param {Number} m00 Component in column 0, row 0 position (index 0)
-     * @param {Number} m01 Component in column 0, row 1 position (index 1)
-     * @param {Number} m02 Component in column 0, row 2 position (index 2)
-     * @param {Number} m10 Component in column 1, row 0 position (index 3)
-     * @param {Number} m11 Component in column 1, row 1 position (index 4)
-     * @param {Number} m12 Component in column 1, row 2 position (index 5)
-     * @param {Number} m20 Component in column 2, row 0 position (index 6)
-     * @param {Number} m21 Component in column 2, row 1 position (index 7)
-     * @param {Number} m22 Component in column 2, row 2 position (index 8)
-     * @returns {mat3} A new mat3
-     */
     pub fn fromValues(
         m00: f32,
         m01: f32,
@@ -118,21 +80,6 @@ impl Matrix3 {
         Matrix3(m00, m01, m02, m10, m11, m12, m20, m21, m22)
     }
 
-    /**
-     * Set the components of a mat3 to the given values
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {Number} m00 Component in column 0, row 0 position (index 0)
-     * @param {Number} m01 Component in column 0, row 1 position (index 1)
-     * @param {Number} m02 Component in column 0, row 2 position (index 2)
-     * @param {Number} m10 Component in column 1, row 0 position (index 3)
-     * @param {Number} m11 Component in column 1, row 1 position (index 4)
-     * @param {Number} m12 Component in column 1, row 2 position (index 5)
-     * @param {Number} m20 Component in column 2, row 0 position (index 6)
-     * @param {Number} m21 Component in column 2, row 1 position (index 7)
-     * @param {Number} m22 Component in column 2, row 2 position (index 8)
-     * @returns {mat3} out
-     */
     pub fn set(
         out: &mut Matrix3,
         m00: f32,
@@ -156,12 +103,6 @@ impl Matrix3 {
         out.8 = m22;
     }
 
-    /**
-     * Set a mat3 to the identity matrix
-     *
-     * @param {mat3} out the receiving matrix
-     * @returns {mat3} out
-     */
     pub fn identity(out: &mut Matrix3) {
         out.0 = 1.;
         out.1 = 0.;
@@ -174,13 +115,6 @@ impl Matrix3 {
         out.8 = 1.;
     }
 
-    /**
-     * Transpose the values of a mat3
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the source matrix
-     * @returns {mat3} out
-     */
     pub fn transpose(out: &mut Matrix3, a: &Matrix3) {
         // If we are transposing ourselves we can skip a few steps but have to cache some values
         if (out as *const Matrix3) == (a as *const Matrix3) {
@@ -206,13 +140,6 @@ impl Matrix3 {
         }
     }
 
-    /**
-     * Inverts a mat3
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the source matrix
-     * @returns {mat3} out
-     */
     pub fn invert(out: &mut Matrix3, a: &Matrix3) {
         let a00 = a.0;
         let a01 = a.1;
@@ -247,13 +174,6 @@ impl Matrix3 {
         out.8 = (a11 * a00 - a01 * a10) * det;
     }
 
-    /**
-     * Calculates the adjugate of a mat3
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the source matrix
-     * @returns {mat3} out
-     */
     pub fn adjoint(out: &mut Matrix3, a: &Matrix3) {
         let a00 = a.0;
         let a01 = a.1;
@@ -276,12 +196,6 @@ impl Matrix3 {
         out.8 = (a00 * a11 - a01 * a10);
     }
 
-    /**
-     * Calculates the determinant of a mat3
-     *
-     * @param {mat3} a the source matrix
-     * @returns {Number} determinant of a
-     */
     pub fn determinant(a: &Matrix3) -> f32 {
         let a00 = a.0;
         let a01 = a.1;
@@ -298,14 +212,6 @@ impl Matrix3 {
             + a02 * (a21 * a10 - a11 * a20)
     }
 
-    /**
-     * Multiplies two mat3"s
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the first operand
-     * @param {mat3} b the second operand
-     * @returns {mat3} out
-     */
     pub fn multiply(out: &mut Matrix3, a: &Matrix3, b: &Matrix3) {
         let a00 = a.0;
         let a01 = a.1;
@@ -340,14 +246,6 @@ impl Matrix3 {
         out.8 = b20 * a02 + b21 * a12 + b22 * a22;
     }
 
-    /**
-     * Translate a mat3 by the given vector
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the matrix to translate
-     * @param {vec2} v vector to translate by
-     * @returns {mat3} out
-     */
     pub fn translate(out: &mut Matrix3, a: &Matrix3, v: &Vector2) {
         let a00 = a.0;
         let a01 = a.1;
@@ -374,14 +272,6 @@ impl Matrix3 {
         out.8 = x * a02 + y * a12 + a22;
     }
 
-    /**
-     * Rotates a mat3 by the given angle
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the matrix to rotate
-     * @param {Number} rad the angle to rotate the matrix by
-     * @returns {mat3} out
-     */
     pub fn rotate(out: &mut Matrix3, a: &Matrix3, rad: f32) {
         let a00 = a.0;
         let a01 = a.1;
@@ -408,14 +298,6 @@ impl Matrix3 {
         out.8 = a22;
     }
 
-    /**
-     * Scales the mat3 by the dimensions in the given vec2
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the matrix to rotate
-     * @param {vec2} v the vec2 to scale the matrix by
-     * @returns {mat3} out
-     **/
     pub fn scale(out: &mut Matrix3, a: &Matrix3, v: &Vector2) {
         let x = v.0;
         let y = v.1;
@@ -433,17 +315,6 @@ impl Matrix3 {
         out.8 = a.8;
     }
 
-    /**
-     * Creates a matrix from a vector translation
-     * This is equivalent to (but much faster than):
-     *
-     *     mat3.identity(dest);
-     *     mat3.translate(dest, dest, vec);
-     *
-     * @param {mat3} out mat3 receiving operation result
-     * @param {vec2} v Translation vector
-     * @returns {mat3} out
-     */
     pub fn fromTranslation(out: &mut Matrix3, v: &Vector2) {
         out.0 = 1.;
         out.1 = 0.;
@@ -456,17 +327,6 @@ impl Matrix3 {
         out.8 = 1.;
     }
 
-    /**
-     * Creates a matrix from a given angle
-     * This is equivalent to (but much faster than):
-     *
-     *     mat3.identity(dest);
-     *     mat3.rotate(dest, dest, rad);
-     *
-     * @param {mat3} out mat3 receiving operation result
-     * @param {Number} rad the angle to rotate the matrix by
-     * @returns {mat3} out
-     */
     pub fn fromRotation(out: &mut Matrix3, rad: f32) {
         let s = f32::sin(rad);
         let c = f32::cos(rad);
@@ -484,17 +344,6 @@ impl Matrix3 {
         out.8 = 1.;
     }
 
-    /**
-     * Creates a matrix from a vector scaling
-     * This is equivalent to (but much faster than):
-     *
-     *     mat3.identity(dest);
-     *     mat3.scale(dest, dest, vec);
-     *
-     * @param {mat3} out mat3 receiving operation result
-     * @param {vec2} v Scaling vector
-     * @returns {mat3} out
-     */
     pub fn fromScaling(out: &mut Matrix3, v: &Vector2) {
         out.0 = v.0;
         out.1 = 0.;
@@ -509,13 +358,6 @@ impl Matrix3 {
         out.8 = 1.;
     }
 
-    /**
-     * Copies the values from a mat2d into a mat3
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat2d} a the matrix to copy
-     * @returns {mat3} out
-     **/
     pub fn fromMat2d(out: &mut Matrix3, a: &Matrix2d) {
         out.0 = a.0;
         out.1 = a.1;
@@ -530,14 +372,6 @@ impl Matrix3 {
         out.8 = 1.;
     }
 
-    /**
-    * Calculates a 3x3 matrix from the given quaternion
-    *
-    * @param {mat3} out mat3 receiving operation result
-    * @param {quat} q Quaternion to create matrix from
-    *
-    * @returns {mat3} out
-    */
     pub fn fromQuat(out: &mut Matrix3, q: &Quaternion) {
         let x = q.0;
         let y = q.1;
@@ -570,14 +404,6 @@ impl Matrix3 {
         out.8 = 1. - xx - yy;
     }
 
-    /**
-    * Calculates a 3x3 normal matrix (transpose inverse) from the 4x4 matrix
-    *
-    * @param {mat3} out mat3 receiving operation result
-    * @param {mat4} a Mat4 to derive the normal matrix from
-    *
-    * @returns {mat3} out
-    */
     pub fn normalFromMat4(out: &mut Matrix3, a: &Matrix4) {
         let a00 = a.0;
         let a01 = a.1;
@@ -630,14 +456,6 @@ impl Matrix3 {
         out.8 = (a30 * b04 - a31 * b02 + a33 * b00) * det;
     }
 
-    /**
-     * Generates a 2D projection matrix with the given bounds
-     *
-     * @param {mat3} out mat3 frustum matrix will be written into
-     * @param {number} width Width of your gl context
-     * @param {number} height Height of gl context
-     * @returns {mat3} out
-     */
     pub fn projection(out: &mut Matrix3, width: f32, height: f32) {
         out.0 = 2. / width;
         out.1 = 0.;
@@ -650,24 +468,12 @@ impl Matrix3 {
         out.8 = 1.;
     }
 
-    /**
-     * Returns a string representation of a mat3
-     *
-     * @param {mat3} a matrix to represent as a string
-     * @returns {String} string representation of the matrix
-     */
     // pub fn str(a: &Matrix3) {
     //   return "mat3(" + a.0 + ", " + a.1 + ", " + a.2 + ", " +
     //           a.3 + ", " + a.4 + ", " + a.5 + ", " +
     //           a.6 + ", " + a.7 + ", " + a.8 + ")";
     // }
 
-    /**
-     * Returns Frobenius norm of a mat3
-     *
-     * @param {mat3} a the matrix to calculate Frobenius norm of
-     * @returns {Number} Frobenius norm
-     */
     pub fn frob(a: &Matrix3) -> f32 {
         (a.0.powi(2)
             + a.1.powi(2)
@@ -681,14 +487,6 @@ impl Matrix3 {
         .sqrt()
     }
 
-    /**
-     * Adds two mat3"s
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the first operand
-     * @param {mat3} b the second operand
-     * @returns {mat3} out
-     */
     pub fn add(out: &mut Matrix3, a: &Matrix3, b: &Matrix3) {
         out.0 = a.0 + b.0;
         out.1 = a.1 + b.1;
@@ -701,14 +499,6 @@ impl Matrix3 {
         out.8 = a.8 + b.8;
     }
 
-    /**
-     * Subtracts matrix b from matrix a
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the first operand
-     * @param {mat3} b the second operand
-     * @returns {mat3} out
-     */
     pub fn subtract(out: &mut Matrix3, a: &Matrix3, b: &Matrix3) {
         out.0 = a.0 - b.0;
         out.1 = a.1 - b.1;
@@ -721,14 +511,6 @@ impl Matrix3 {
         out.8 = a.8 - b.8;
     }
 
-    /**
-     * Multiply each element of the matrix by a scalar.
-     *
-     * @param {mat3} out the receiving matrix
-     * @param {mat3} a the matrix to scale
-     * @param {Number} b amount to scale the matrix"s elements by
-     * @returns {mat3} out
-     */
     pub fn multiplyScalar(out: &mut Matrix3, a: &Matrix3, b: f32) {
         out.0 = a.0 * b;
         out.1 = a.1 * b;
@@ -741,15 +523,6 @@ impl Matrix3 {
         out.8 = a.8 * b;
     }
 
-    /**
-     * Adds two mat3"s after multiplying each element of the second operand by a scalar value.
-     *
-     * @param {mat3} out the receiving vector
-     * @param {mat3} a the first operand
-     * @param {mat3} b the second operand
-     * @param {Number} scale the amount to scale b"s elements by before adding
-     * @returns {mat3} out
-     */
     pub fn multiplyScalarAndAdd(out: &mut Matrix3, a: &Matrix3, b: &Matrix3, scale: f32) {
         out.0 = a.0 + (b.0 * scale);
         out.1 = a.1 + (b.1 * scale);
@@ -762,13 +535,6 @@ impl Matrix3 {
         out.8 = a.8 + (b.8 * scale);
     }
 
-    /**
-     * Returns whether or not the matrices have exactly the same elements in the same position (when compared with ==)
-     *
-     * @param {mat3} a The first matrix.
-     * @param {mat3} b The second matrix.
-     * @returns {Boolean} True if the matrices are equal, false otherwise.
-     */
     pub fn exactEquals(a: &Matrix3, b: &Matrix3) -> bool {
         a.0 == b.0
             && a.1 == b.1
@@ -781,13 +547,6 @@ impl Matrix3 {
             && a.8 == b.8
     }
 
-    /**
-     * Returns whether or not the matrices have approximately the same elements in the same position.
-     *
-     * @param {mat3} a The first matrix.
-     * @param {mat3} b The second matrix.
-     * @returns {Boolean} True if the matrices are equal, false otherwise.
-     */
     pub fn equals(a: &Matrix3, b: &Matrix3) -> bool {
         let a0 = a.0;
         let a1 = a.1;
@@ -818,18 +577,10 @@ impl Matrix3 {
             && f32::abs(a8 - b8) <= EPSILON * f32::max(1.0, f32::max(f32::abs(a8), f32::abs(b8)))
     }
 
-    /**
-     * Alias for {@link mat3.multiply}
-     * @function
-     */
     pub fn mul(out: &mut Matrix3, a: &Matrix3, b: &Matrix3) {
         Matrix3::multiply(out, a, b);
     }
 
-    /**
-     * Alias for {@link mat3.subtract}
-     * @function
-     */
     pub fn sub(out: &mut Matrix3, a: &Matrix3, b: &Matrix3) {
         Matrix3::subtract(out, a, b);
     }

@@ -16,7 +16,7 @@ const outPath = path.resolve(__dirname, 'dist');
 module.exports = {
   entry: {
     main: path.resolve(__dirname, './demo/index.tsx'),
-    'react-packet': ['react', 'react-dom']
+    'react-packet': ['react', 'react-dom', 'gl-matrix']
   },
 
   output: {

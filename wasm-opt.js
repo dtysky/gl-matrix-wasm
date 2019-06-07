@@ -17,7 +17,7 @@ binaryen.setOptimizeLevel(0);
 binaryen.setShrinkLevel(0);
 wasm.optimize();
 
-fs.writeFileSync(fp.replace('.wasm', '.wast'), wasm.emitText());
+// fs.writeFileSync(fp.replace('.wasm', '.wast'), wasm.emitText());
 
 const distBuffer = wasm.emitBinary();
 fs.writeFileSync(fp, distBuffer);
