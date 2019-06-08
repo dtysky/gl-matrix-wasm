@@ -239,7 +239,7 @@ impl Vector3 {
         let y = a.1;
         let z = a.2;
         let mut w = m.3 * x + m.7 * y + m.11 * z + m.15;
-        if (w < EPSILON) {
+        if w < EPSILON {
             w = 1.0;
         }
         out.0 = (m.0 * x + m.4 * y + m.8 * z + m.12) / w;

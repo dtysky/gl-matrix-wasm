@@ -108,9 +108,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './demo/index.html'
     }),
-    new WasmPackPlugin({
-      crateDirectory: path.resolve(__dirname, './'),
-      forceMode: 'development'
-    })
+    // new WasmPackPlugin({
+    //   crateDirectory: path.resolve(__dirname, './'),
+    //   forceMode: 'development'
+    // })
   ]
 };

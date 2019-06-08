@@ -11,6 +11,21 @@ use super::matrix3::*;
 use super::vector3::*;
 
 #[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_u32(a: u32);
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_many(a: &str, b: &str);
+}
+
+#[macro_export]
+macro_rules! console_log {
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+}
+
+#[wasm_bindgen]
 pub struct Quaternion(pub f32, pub f32, pub f32, pub f32);
 
 #[wasm_bindgen]
@@ -79,8 +94,12 @@ impl Quaternion {
         let ay = a.1;
         let az = a.2;
         let aw = a.3;
-        let bx = f32::sin(rad);
-        let bw = f32::cos(rad);
+        let mut bx = f32::sin(rad);
+        let mut bw = f32::cos(rad);
+
+        if bx.abs() < EPSILON {
+            bx = 0.;
+        }
 
         out.0 = ax * bw + aw * bx;
         out.1 = ay * bw + az * bx;
@@ -144,23 +163,27 @@ impl Quaternion {
         let mut bw = b.3;
 
         let mut omega = 0.;
-        let mut cosom = 0.;
         let mut sinom = 0.;
         let mut scale0 = 0.;
         let mut scale1 = 0.;
-
         // calc cosine
         let mut cosom = ax * bx + ay * by + az * bz + aw * bw;
+
+        if cosom.abs() < EPSILON {
+            cosom = 0.;
+        }
+
         // adjust signs (if necessary)
-        if (cosom < 0.0) {
+        if cosom < 0. {
             cosom = -cosom;
             bx = -bx;
             by = -by;
             bz = -bz;
             bw = -bw;
         }
+
         // calculate coefficients
-        if ((1.0 - cosom) > EPSILON) {
+        if (1.0 - cosom) > EPSILON {
             // standard case (slerp)
             omega = f32::acos(cosom);
             sinom = f32::sin(omega);
@@ -172,6 +195,7 @@ impl Quaternion {
             scale0 = 1.0 - t;
             scale1 = t;
         }
+
         // calculate final values
         out.0 = scale0 * ax + scale1 * bx;
         out.1 = scale0 * ay + scale1 * by;
@@ -353,7 +377,7 @@ impl Quaternion {
         out.3 = aw + t * (b.3 - aw);
     }
 
-    pub fn len(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> f32 {
+    pub fn len(a: &Quaternion) -> f32 {
         let x = a.0;
         let y = a.1;
         let z = a.2;
@@ -361,7 +385,7 @@ impl Quaternion {
         (x.powi(2) + y.powi(2) + z.powi(2) + w.powi(2)).sqrt()
     }
 
-    pub fn squaredLength(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> f32 {
+    pub fn squaredLength(a: &Quaternion) -> f32 {
         let x = a.0;
         let y = a.1;
         let z = a.2;
@@ -369,8 +393,8 @@ impl Quaternion {
         x * x + y * y + z * z + w * w
     }
 
-    pub fn sqrLen(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) {
-        Quaternion::squaredLength(out, a, b);
+    pub fn sqrLen(a: &Quaternion) -> f32 {
+        Quaternion::squaredLength(a)
     }
 
     pub fn normalize(out: &mut Quaternion, a: &Quaternion) {
@@ -388,11 +412,11 @@ impl Quaternion {
         out.3 = w * len;
     }
 
-    pub fn exactEquals(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> bool {
+    pub fn exactEquals(a: &Quaternion, b: &Quaternion) -> bool {
         a.0 == b.0 && a.1 == b.1 && a.2 == b.2 && a.3 == b.3
     }
 
-    pub fn equals(out: &mut Quaternion, a: &Quaternion, b: &Quaternion) -> bool {
+    pub fn equals(a: &Quaternion, b: &Quaternion) -> bool {
         let a0 = a.0;
         let a1 = a.1;
         let a2 = a.2;

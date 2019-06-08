@@ -128,7 +128,7 @@ impl Vector4 {
         let y = b.1 - a.1;
         let z = b.2 - a.2;
         let w = b.3 - a.3;
-        (x.powi(2) + y.powi(2) + z.powi(2) + z.powi(3)).sqrt()
+        (x.powi(2) + y.powi(2) + z.powi(2) + w.powi(2)).sqrt()
     }
 
     pub fn squaredDistance(a: &Vector4, b: &Vector4) -> f32 {
@@ -144,7 +144,7 @@ impl Vector4 {
         let y = a.1;
         let z = a.2;
         let w = a.3;
-        (x.powi(2) + y.powi(2) + z.powi(2) + z.powi(3)).sqrt()
+        (x.powi(2) + y.powi(2) + z.powi(2) + w.powi(2)).sqrt()
     }
 
     pub fn squaredLength(a: &Vector4) -> f32 {
@@ -189,12 +189,20 @@ impl Vector4 {
     }
 
     pub fn cross(out: &mut Vector4, u: &Vector4, v: &Vector4, w: &Vector4) {
-        let A = (v.0 * w.1) - (v.1 * w.0);
-        let B = (v.0 * w.2) - (v.2 * w.0);
-        let C = (v.0 * w.3) - (v.3 * w.0);
-        let D = (v.1 * w.2) - (v.2 * w.1);
-        let E = (v.1 * w.3) - (v.3 * w.1);
-        let F = (v.2 * w.3) - (v.3 * w.2);
+        let v0 = v.0;
+        let v1 = v.1;
+        let v2 = v.2;
+        let v3 = v.3;
+        let w0 = w.0;
+        let w1 = w.1;
+        let w2 = w.2;
+        let w3 = w.3;
+        let A = (v0 * w1) - (v1 * w0);
+        let B = (v0 * w2) - (v2 * w0);
+        let C = (v0 * w3) - (v3 * w0);
+        let D = (v1 * w2) - (v2 * w1);
+        let E = (v1 * w3) - (v3 * w1);
+        let F = (v2 * w3) - (v3 * w2);
         let G = u.0;
         let H = u.1;
         let I = u.2;
@@ -232,16 +240,16 @@ impl Vector4 {
         let mut v2 = 0.;
         let mut v3 = 0.;
         let mut v4 = 0.;
-        let mut s1 = 0.;
-        let mut s2 = 0.;
+        let mut s1 = 2.;
+        let mut s2 = 2.;
 
-        while (s1 > 1.) {
+        while s1 > 1. {
             v1 = RANDOM() * 2. - 1.;
             v2 = RANDOM() * 2. - 1.;
             s1 = v1 * v1 + v2 * v2;
         }
 
-        while (s2 > 1.) {
+        while s2 > 1. {
             v3 = RANDOM() * 2. - 1.;
             v4 = RANDOM() * 2. - 1.;
             s2 = v3 * v3 + v4 * v4;
