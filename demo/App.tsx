@@ -8,14 +8,14 @@ import * as React from 'react';
 import * as mathJS from 'gl-matrix';
 import * as benchmark from 'benchmark';
 
-// import * as math from 'gl-matrix-wasm';
+import * as math from 'gl-matrix-wasm';
 
 export default class App extends React.PureComponent {
   private canvas: React.RefObject<HTMLCanvasElement> = React.createRef();
 
   public async componentDidMount() {
-    // await math.init();
-    const math = await import('gl-matrix-wasm/pkg/gl_matrix_wasm.split');
+    await math.init();
+    // const math = await import('gl-matrix-wasm/pkg/gl_matrix_wasm.split');
 
     const v1 = math.Vector4.fromValues(1, 0, 0, 0);
     const v2 = math.Vector4.fromValues(0, 1, 0, 0);
@@ -78,7 +78,7 @@ export default class App extends React.PureComponent {
       }
     ]);
 
-    // alert(res);
+    alert(res);
   }
 
   private async test(tests: {func: Function, name: string}[]): Promise<string> {

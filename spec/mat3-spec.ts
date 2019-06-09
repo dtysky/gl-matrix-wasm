@@ -1,18 +1,22 @@
 import { expect } from './spec-helper';
+import {
+    init,
+    Vector2 as vec2,
+    Vector3 as vec3,
+    Vector4 as vec4,
+    Matrix2 as mat2,
+    Matrix2d as mat2d,
+    Matrix3 as mat3,
+    Matrix4 as mat4,
+    Quaternion as quat,
+    Quaternion2 as quat2,
+} from '../pkg/gl_matrix_wasm';
 
 describe("mat3", function() {
     let out, matA, matB, identity, result;
-    let vec3: typeof import('../pkg/gl_matrix_wasm').Vector3, mat3: typeof import('../pkg/gl_matrix_wasm').Matrix3, mat4, vec2, quat;
 
     before(done => {
-        import('../pkg/gl_matrix_wasm').then(({Vector3, Matrix3, Matrix4, Vector2, Quaternion}) => {
-            vec2 = Vector2;
-            vec3 = Vector3;
-            mat3 = Matrix3;
-            mat4 = Matrix4;
-            quat = Quaternion;
-            done();
-        });
+        init().then(() => done());
     });
 
     beforeEach(function() {

@@ -1,14 +1,22 @@
 import { expect } from './spec-helper';
+import {
+    init,
+    Vector2 as vec2,
+    Vector3 as vec3,
+    Vector4 as vec4,
+    Matrix2 as mat2,
+    Matrix2d as mat2d,
+    Matrix3 as mat3,
+    Matrix4 as mat4,
+    Quaternion as quat,
+    Quaternion2 as quat2,
+} from '../pkg/gl_matrix_wasm';
 
 describe("vec4", async function () {
-    let vec4;
     let out, vecA, vecB, result;
 
     before(done => {
-        import('../pkg/gl_matrix_wasm').then(({Vector4}) => {
-            vec4 = Vector4;
-            done();
-        });
+        init().then(() => done());
     });
     
     beforeEach(function () {
