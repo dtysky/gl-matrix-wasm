@@ -36,8 +36,32 @@ const distBuffer = binaryen.parseText(wast).emitBinary();
 fs.writeFileSync(fp, distBuffer);
 
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm.d.ts');
-fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'}).replace(/get elements\(\)/g, 'readonly elements'));
+fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'})
+  .replace(/get elements\(\)/g, 'readonly elements'));
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm.js');
-fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'}));
+
+const offsets = {
+  Matrix2: 4,
+  Matrix2d: 6,
+  Matrix3: 9,
+  Matrix4: 16,
+  Vector2: 2,
+  Vector3: 3,
+  Vector4: 4,
+  Quaternion: 4,
+  Quaternion2: 8
+};
+fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'})
+  .replace(
+    /get elements\(\) {[\s\S\n]+?}[\s\S\n]+?@returns {(\S+)}/g,
+    (_, type) => `get elements() {
+      const ptr = this.ptr / 4 + 1;
+      return new Float32Array(wasm.memory.buffer).slice(ptr, ptr + ${offsets[type]});
+    }
+    /**
+     * @returns {$1}
+}`
+  )
+);
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm_bg.d.ts');
 fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'}));

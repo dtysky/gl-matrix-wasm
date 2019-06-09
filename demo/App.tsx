@@ -38,51 +38,50 @@ export default class App extends React.PureComponent {
     // const e = new Float32Array((math as any).memory.buffer).slice(ptr5, ptr5  + 16);
 
     // console.log(e);
-    // const res = await this.test([
-    //   {
-    //     func: () => {
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       math.Matrix4.multiply(m3, m1, m2);
-    //       // const e = buf.slice(ptr3 / 4 + 1, ptr3 / 4 + 4);
-    //       // const e = m3.elements;
-    //     },
-    //     name: 'WASM'
-    //   },
-    //   {
-    //     func: () => {
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //       mathJS.mat4.multiply(m1j, m2j, m3j);
-    //     },
-    //     name: 'JS'
-    //   }
-    // ]);
-
     const res = await this.test([
       {
-        func: () => math.Matrix4.multiply(m3, m1, m2),
+        func: () => {
+          math.Matrix4.multiply(m3, m1, m2);
+          math.Matrix4.multiply(m3, m1, m2);
+          math.Matrix4.multiply(m3, m1, m2);
+          math.Matrix4.multiply(m3, m1, m2);
+          math.Matrix4.multiply(m3, m1, m2);
+          math.Matrix4.multiply(m3, m1, m2);
+          math.Matrix4.multiply(m3, m1, m2);
+          math.Matrix4.multiply(m3, m1, m2);
+          math.Matrix4.multiply(m3, m1, m2);
+          math.Matrix4.multiply(m3, m1, m2);
+          const e = m3.elements;
+        },
         name: 'WASM'
       },
       {
-        func: () => mathJS.mat4.multiply(m1j, m2j, m3j),
+        func: () => {
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+          mathJS.mat4.multiply(m1j, m2j, m3j);
+        },
         name: 'JS'
       }
     ]);
+
+    // const res = await this.test([
+    //   {
+    //     func: () => math.Matrix4.multiply(m3, m1, m2),
+    //     name: 'WASM'
+    //   },
+    //   {
+    //     func: () => mathJS.mat4.multiply(m1j, m2j, m3j),
+    //     name: 'JS'
+    //   }
+    // ]);
 
     // alert(res);
   }
