@@ -11,21 +11,6 @@ use super::matrix3::*;
 use super::vector3::*;
 
 #[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_many(a: &str, b: &str);
-}
-
-#[macro_export]
-macro_rules! console_log {
-    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
-}
-
-#[wasm_bindgen]
 pub struct Quaternion(pub f32, pub f32, pub f32, pub f32);
 
 #[wasm_bindgen]
@@ -101,6 +86,10 @@ impl Quaternion {
             bx = 0.;
         }
 
+        if bw.abs() < EPSILON {
+            bw = 0.;
+        }
+
         out.0 = ax * bw + aw * bx;
         out.1 = ay * bw + az * bx;
         out.2 = az * bw - ay * bx;
@@ -114,8 +103,16 @@ impl Quaternion {
         let ay = a.1;
         let az = a.2;
         let aw = a.3;
-        let by = f32::sin(rad);
-        let bw = f32::cos(rad);
+        let mut by = f32::sin(rad);
+        let mut bw = f32::cos(rad);
+
+        if by.abs() < EPSILON {
+            by = 0.;
+        }
+
+        if bw.abs() < EPSILON {
+            bw = 0.;
+        }
 
         out.0 = ax * bw - az * by;
         out.1 = ay * bw + aw * by;
@@ -130,8 +127,16 @@ impl Quaternion {
         let ay = a.1;
         let az = a.2;
         let aw = a.3;
-        let bz = f32::sin(rad);
-        let bw = f32::cos(rad);
+        let mut bz = f32::sin(rad);
+        let mut bw = f32::cos(rad);
+
+        if bz.abs() < EPSILON {
+            bz = 0.;
+        }
+
+        if bw.abs() < EPSILON {
+            bw = 0.;
+        }
 
         out.0 = ax * bw + ay * bz;
         out.1 = ay * bw - ax * bz;

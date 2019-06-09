@@ -36,6 +36,7 @@ module.exports = {
   externals: {
     'fs': true,
     'path': true,
+    benchmark: 'Benchmark'
   },
   
   module: {

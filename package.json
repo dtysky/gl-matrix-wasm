@@ -38,6 +38,7 @@
   },
   "homepage": "https://github.com/dtysky/gl-matrix-wasm#readme",
   "devDependencies": {
+    "@types/benchmark": "^1.0.31",
     "@types/gl-matrix": "^2.4.5",
     "@types/mocha": "^5.2.7",
     "@types/node": "^6.0.52",

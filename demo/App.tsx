@@ -6,6 +6,7 @@
  */
 import * as React from 'react';
 import * as mathJS from 'gl-matrix';
+import * as benchmark from 'benchmark';
 
 export default class App extends React.PureComponent {
   private canvas: React.RefObject<HTMLCanvasElement> = React.createRef();
@@ -18,45 +19,101 @@ export default class App extends React.PureComponent {
     const v2 = math.Vector4.fromValues(0, 1, 0, 0);
     const v3 = math.Vector4.fromValues(0, 0, 1, 0);
 
-    math.Vector4.cross(v3, v1, v2, v3);
-    console.log(v1.elements);
-    console.log(v2.elements);
-    console.log(v3.elements);
+    // math.Vector4.cross(v3, v1, v2, v3);
+    // console.log(v1.elements);
+    // console.log(v2.elements);
+    // console.log(v3.elements);
 
-    let matr = mathJS.mat3.create();
-    let out = mathJS.quat.create();
-    mathJS.mat3.transpose(matr, mathJS.mat3.invert(matr, mathJS.mat3.fromMat4(matr, mathJS.mat4.lookAt(mathJS.mat4.create(), [0, 0, 0], [-1, 0, 0], [0, -1, 0]))));
-    mathJS.quat.fromMat3(out, matr);
-    const result = mathJS.vec3.transformQuat(mathJS.vec3.create(), [3,2,-1], mathJS.quat.normalize(out, out));
-    console.log(result);
-    // const m1 = math.Matrix4.create();
-    // const m2 = math.Matrix4.create();
-    // const m3 = math.Matrix4.create();
+    const out = (mathJS as any).quat2.create();
+    const quat2A = (mathJS as any).quat2.create();
+    (mathJS as any).quat2.fromRotationTranslation(quat2A, mathJS.quat.fromValues(1,2,3,4), mathJS.vec3.fromValues(-5, 4, 10));
+    (mathJS as any).quat2.normalize(quat2A, quat2A);
+    (mathJS as any).quat2.rotateX(out, quat2A, 5);
+    console.log(out);
 
-    // const m1j = mathJS.mat4.create();
-    // const m2j = mathJS.mat4.create();
-    // const m3j = mathJS.mat4.create();
+    const m1 = math.Matrix4.create();
+    const m2 = math.Matrix4.create();
+    const m3 = math.Matrix4.create();
 
-    // let res = this.test(() => math.Matrix4.multiply(m3, m1, m2), 'WASM', 1000);
-    // res += '\n';
-    // res += this.test(() => mathJS.mat4.multiply(m1j, m2j, m3j), 'JS', 1000);
+    const m1j = mathJS.mat4.create();
+    const m2j = mathJS.mat4.create();
+    const m3j = mathJS.mat4.create();
+
+    const ptr1 = ((m1 as any).ptr + 4) / 4;
+    const ptr2 = ((m2 as any).ptr + 4) / 4;
+    const ptr3 = ((m3 as any).ptr + 4) / 4;
+    const m5 = math.Matrix4.fromValues(1, 2, 3, 4, 5 ,6 , 7,8 ,9, 10, 11, 12, 13, 14, 15, 16);
+    const ptr5 = ((m5 as any).ptr + 4) / 4;
+    // const e = new Float32Array((math as any).memory.buffer).slice(ptr5, ptr5  + 16);
+    const buf = new Float32Array((math as any).memory.buffer);
+
+    // console.log(e);
+    // const res = await this.test([
+    //   {
+    //     func: () => {
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       math.Matrix4.multiply(m3, m1, m2);
+    //       // const e = buf.slice(ptr3 / 4 + 1, ptr3 / 4 + 4);
+    //       // const e = m3.elements;
+    //     },
+    //     name: 'WASM'
+    //   },
+    //   {
+    //     func: () => {
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //       mathJS.mat4.multiply(m1j, m2j, m3j);
+    //     },
+    //     name: 'JS'
+    //   }
+    // ]);
+
+    const res = await this.test([
+      {
+        func: () => math.Matrix4.multiply(m3, m1, m2),
+        name: 'WASM'
+      },
+      {
+        func: () => mathJS.mat4.multiply(m1j, m2j, m3j),
+        name: 'JS'
+      }
+    ]);
 
     // alert(res);
   }
 
-  private test(func: Function, name: string, times: number): string {
-    let tsTotal = 0;
+  private async test(tests: {func: Function, name: string}[]): Promise<string> {
+    const suite = new benchmark.Suite();
 
-    for (let index = 0; index < times; index += 1) {
-      const ts = performance.now();
-      func();
-      tsTotal += performance.now() - ts;
-    }
+    let result = '';
+    tests.forEach(t => suite.add(t.name, t.func, {async: true}));
 
-    const result = `${name}:` + tsTotal / times + 'ms';
-    console.log(result);
-
-    return result;
+    return new Promise(resolve => {
+      suite
+      .on('cycle', function(event) {
+        result += String(event.target) + '\n';
+      })
+      .on('complete', () => {
+        console.log(result);
+        resolve(result);
+      })
+      .run({async: true});
+    });
   }
 
   public componentWillUnmount() {

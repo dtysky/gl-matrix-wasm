@@ -254,6 +254,10 @@ impl Quaternion2 {
         by = o.1;
         bz = o.2;
         bw = o.3;
+        out.0 = bx;
+        out.1 = by;
+        out.2 = bz;
+        out.3 = bw;
         out.4 = ax1 * bw + aw1 * bx + ay1 * bz - az1 * by;
         out.5 = ay1 * bw + aw1 * by + az1 * bx - ax1 * bz;
         out.6 = az1 * bw + aw1 * bz + ax1 * by - ay1 * bx;
@@ -279,6 +283,10 @@ impl Quaternion2 {
         by = o.1;
         bz = o.2;
         bw = o.3;
+        out.0 = bx;
+        out.1 = by;
+        out.2 = bz;
+        out.3 = bw;
         out.4 = ax1 * bw + aw1 * bx + ay1 * bz - az1 * by;
         out.5 = ay1 * bw + aw1 * by + az1 * bx - ax1 * bz;
         out.6 = az1 * bw + aw1 * bz + ax1 * by - ay1 * bx;
@@ -304,6 +312,10 @@ impl Quaternion2 {
         by = o.1;
         bz = o.2;
         bw = o.3;
+        out.0 = bx;
+        out.1 = by;
+        out.2 = bz;
+        out.3 = bw;
         out.4 = ax1 * bw + aw1 * bx + ay1 * bz - az1 * by;
         out.5 = ay1 * bw + aw1 * by + az1 * bx - ax1 * bz;
         out.6 = az1 * bw + aw1 * bz + ax1 * by - ay1 * bx;

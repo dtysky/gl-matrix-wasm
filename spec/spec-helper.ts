@@ -35,8 +35,12 @@ export function expect(e) {
                 if (typeof (e) == 'number')
                     assert(Math.abs(e - a) >= EPSILON);
 
-                e = e.elements;
-                a = a.elements;
+                    if (e.ptr) {
+                        e = e.elements;
+                    }
+                    if (a.ptr) {
+                        a = a.elements;
+                    }
                 if (e.length != a.length)
                     return;
                 for (let i = 0; i < e.length; i++) {
@@ -93,9 +97,15 @@ export function expect(e) {
         },
 
         //Dual quaternions are very special & unique snowflakes
-        toBeEqualishQuat2: function (a, epsilon) {
+        toBeEqualishQuat2: function (a, epsilon?) {
             if (epsilon == undefined) epsilon = EPSILON;
             let allSignsFlipped = false;
+            if (e.ptr) {
+                e = e.elements;
+            }
+            if (a.ptr) {
+                a = a.elements;
+            }
             if (e.length != a.length)
                 expected(e, "to have the same length as", a);
 
