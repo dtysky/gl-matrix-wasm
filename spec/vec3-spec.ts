@@ -64,7 +64,9 @@ describe("vec3", function() {
         });
 
         describe("with a lookAt", function() {
-            beforeEach(function() { matr = mat4.lookAt(mat4.create(), vec3.fromValues(5, 6, 7), vec3.fromValues(2, 6, 7), vec3.fromValues(0, 1, 0)) });
+            beforeEach(function() {
+                matr = mat4.create();
+                mat4.lookAt(matr, vec3.fromValues(5, 6, 7), vec3.fromValues(2, 6, 7), vec3.fromValues(0, 1, 0)) });
 
             beforeEach(function() { result = vec3.transformMat4(out, vecA, matr); });
 
@@ -81,8 +83,9 @@ describe("vec3", function() {
                         0, 1, 0, 0,
                         0, 0, -1.02, -1,
                         0, 0, -2.02, 0);
-                result = vec3.transformMat4(vec3.create(), vec3.fromValues(10, 20, 30), matr);
-                expect(result).toBeEqualish([-0.25, -0.666666, 1.087333]);
+                let v = vec3.create();
+                result = vec3.transformMat4(v, vec3.fromValues(10, 20, 30), matr);
+                expect(v).toBeEqualish([-0.25, -0.666666, 1.087333]);
             });
         });
 
@@ -134,12 +137,14 @@ describe("vec3", function() {
 
         describe("with a lookAt normal matrix", function() {
             beforeEach(function() {
-                matr = mat4.lookAt(mat4.create(), [5, 6, 7], [2, 6, 7], [0, 1, 0]);
+                matr = mat4.create();
+                mat4.lookAt(matr, vec3.fromValues(5, 6, 7), vec3.fromValues(2, 6, 7), vec3.fromValues(0, 1, 0));
                 let n = mat3.create();
-                matr = mat3.transpose(n, mat3.invert(n, mat3.fromMat4(n, matr)));
+                mat3.fromMat4(n, matr);
+                mat3.invert(n, n);
+                mat3.transpose(n, n);
+                result = vec3.transformMat3(out, vec3.fromValues(1,0,0), matr);
             });
-
-            beforeEach(function() { result = vec3.transformMat3(out, vec3.fromValues(1,0,0), matr); });
 
             it("should rotate the input", function() {
                 expect(out).toBeEqualish([ 0,0,1 ]);

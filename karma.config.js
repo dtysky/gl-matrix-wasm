@@ -17,7 +17,6 @@ module.exports = function(config) {
 
     files: [
       'spec/**/*-spec.ts'
-      // 'spec/mat2d-spec.ts'
     ],
 
     port: 9876,
@@ -31,11 +30,6 @@ module.exports = function(config) {
     browsers: ['Chrome'],
 
     webpack: {
-      // karma watches the test entry points
-      // (you don't need to specify the entry option)
-      // webpack watches dependencies
-
-      // webpack configuration
       output: {
         path: outPath,
         filename: '[name].[hash].js',
@@ -104,14 +98,12 @@ module.exports = function(config) {
       'spec/**/*.ts': ['webpack']
     },
 
-    // reporters: ['progress'],
-
     karmaTypescriptConfig: {
       reports: {
         'html': 'reports/coverage'
       }
     },
 
-    // singleRun: true
+    singleRun: true
   })
 };

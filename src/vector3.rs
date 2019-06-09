@@ -156,7 +156,7 @@ impl Vector3 {
         let y = a.1;
         let z = a.2;
         let mut len = x * x + y * y + z * z;
-        if (len > EPSILON) {
+        if len > EPSILON {
             //TODO: evaluate use of glm_invsqrt here?
             len = 1. / f32::sqrt(len);
         }
@@ -170,6 +170,34 @@ impl Vector3 {
     }
 
     pub fn cross(out: &mut Vector3, a: &Vector3, b: &Vector3) {
+        if (out as *const Vector3) == (a as *const Vector3) {
+            let ax = out.0;
+            let ay = out.1;
+            let az = out.2;
+            let bx = b.0;
+            let by = b.1;
+            let bz = b.2;
+
+            out.0 = ay * bz - az * by;
+            out.1 = az * bx - ax * bz;
+            out.2 = ax * by - ay * bx;
+            return;
+        }
+
+        if (out as *const Vector3) == (b as *const Vector3) {
+            let ax = a.0;
+            let ay = a.1;
+            let az = a.2;
+            let bx = out.0;
+            let by = out.1;
+            let bz = out.2;
+
+            out.0 = ay * bz - az * by;
+            out.1 = az * bx - ax * bz;
+            out.2 = ax * by - ay * bx;
+            return;            
+        }
+
         let ax = a.0;
         let ay = a.1;
         let az = a.2;
@@ -239,7 +267,8 @@ impl Vector3 {
         let y = a.1;
         let z = a.2;
         let mut w = m.3 * x + m.7 * y + m.11 * z + m.15;
-        if w < EPSILON {
+
+        if w.abs() < EPSILON {
             w = 1.0;
         }
         out.0 = (m.0 * x + m.4 * y + m.8 * z + m.12) / w;

@@ -189,6 +189,33 @@ impl Vector4 {
     }
 
     pub fn cross(out: &mut Vector4, u: &Vector4, v: &Vector4, w: &Vector4) {
+        if (out as *const Vector4) == (u as *const Vector4) {
+            let v0 = v.0;
+            let v1 = v.1;
+            let v2 = v.2;
+            let v3 = v.3;
+            let w0 = w.0;
+            let w1 = w.1;
+            let w2 = w.2;
+            let w3 = w.3;
+            let A = (v0 * w1) - (v1 * w0);
+            let B = (v0 * w2) - (v2 * w0);
+            let C = (v0 * w3) - (v3 * w0);
+            let D = (v1 * w2) - (v2 * w1);
+            let E = (v1 * w3) - (v3 * w1);
+            let F = (v2 * w3) - (v3 * w2);
+            let G = out.0;
+            let H = out.1;
+            let I = out.2;
+            let J = out.3;
+
+            out.0 = (H * F) - (I * E) + (J * D);
+            out.1 = -(G * F) + (I * C) - (J * B);
+            out.2 = (G * E) - (H * C) + (J * A);
+            out.3 = -(G * D) + (H * B) - (I * A);
+            return;
+        }
+
         let v0 = v.0;
         let v1 = v.1;
         let v2 = v.2;
