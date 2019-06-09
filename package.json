@@ -1,13 +1,13 @@
 {
   "name": "gl-matrix-wasm",
-  "version": "0.1.0",
+  "version": "0.8.0",
   "description": "Port gl-matrix to webassembly.",
   "main": "pkg/gl_matrix_wasm.js",
   "types": "pkg/gl_matrix_wasm.d.ts",
   "scripts": {
     "dev": "node server.dev.js",
     "demo-build": "npm run build && webpack -p --config webpack.pd.config.js",
-    "build": "wasm-pack build && node ./wasm-opt.js",
+    "build": "wasm-pack build --release --target web && node ./wasm-opt.js",
     "prepublish": "npm run build",
     "test-wsl": "export CHROME_BIN='/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe' && export TEMP='/mnt/c/temp' && karma start karma.config.js",
     "test": "karma start karma.config.js"

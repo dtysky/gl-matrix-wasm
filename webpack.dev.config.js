@@ -30,7 +30,11 @@ module.exports = {
   mode: 'development',
 
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.wasm']
+    extensions: ['.ts', '.tsx', '.js', '.wasm'],
+    alias: {
+      'gl-matrix-wasm/pkg/gl_matrix_wasm.split': '../pkg/gl_matrix_wasm',
+      'gl-matrix-wasm': '../pkg/gl_matrix_wasm'
+    }
   },
 
   externals: {

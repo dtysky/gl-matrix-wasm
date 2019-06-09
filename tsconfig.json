@@ -7,7 +7,12 @@
     "target": "es5",
     "jsx": "react",
     "lib": ["es2017", "dom"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "gl-matrix-wasm/pkg/gl_matrix_wasm.split": ["./pkg/gl_matrix_wasm.d.ts"],
+      "gl-matrix-wasm": ["./pkg/gl_matrix_wasm.d.ts"]
+    }
   },
   "include": [
     "pkg/**/*.ts",

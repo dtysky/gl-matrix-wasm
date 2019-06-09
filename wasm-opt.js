@@ -30,14 +30,19 @@ wasm.optimize();
 const wast = wasm.emitText()
   // .replace(/\(br_if \$label\$1[\s\n]+?\(i32.eq\n[\s\S\n]+?i32.const -1\)[\s\n]+\)[\s\n]+\)/g, '');
   .replace(/\(br_if \$label\$\d\n\s+\(i32\.eq\n\s+\(tee_local \$\d+?\n\s+\(i32\.load\n\s+\(get_local \$\d\)\n\s+\)\n\s+\)\n\s+\(i32\.const -1\)\n\s+\)\n\s+\)/g, '');
-fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
+// fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
 
 const distBuffer = binaryen.parseText(wast).emitBinary();
 fs.writeFileSync(fp, distBuffer);
 
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm.d.ts');
 fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'})
-  .replace(/get elements\(\)/g, 'readonly elements'));
+  .replace(/get elements\(\)/g, 'readonly elements')
+  .replace(
+    'export default function init (module_or_path: RequestInfo | BufferSource | WebAssembly.Module): Promise<any>;',
+    'export function init (): Promise<any>;'
+  )
+);
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm.js');
 
 const offsets = {
@@ -51,7 +56,7 @@ const offsets = {
   Quaternion: 4,
   Quaternion2: 8
 };
-fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'})
+const content = fs.readFileSync(fp, {encoding: 'utf8'})
   .replace(
     /get elements\(\) {[\s\S\n]+?}[\s\S\n]+?@returns {(\S+)}/g,
     (_, type) => `get elements() {
@@ -60,8 +65,19 @@ fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'})
     }
     /**
      * @returns {$1}
-}`
+  }`
   )
+  .replace('function init(module) {', 'function initModule(module) {')
+  .replace('export default init;', '');
+fs.writeFileSync(fp, header + content + `
+export async function init() {
+  return initModule(new Uint8Array([${distBuffer.join(',')}]));
+}
+  `
+);
+fs.writeFileSync(
+  fp.replace('.js', '.split.js'),
+  header + `import * as wasm from './gl_matrix_wasm_bg';` + content.replace('let wasm;', '')
 );
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm_bg.d.ts');
 fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'}));
