@@ -8,6 +8,21 @@ use wasm_bindgen::prelude::*;
 
 use super::common::*;
 use super::vector2::*;
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_u32(a: u32);
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_many(a: &str, b: &str);
+}
+
+#[macro_export]
+macro_rules! console_log {
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+}
+
 
 #[wasm_bindgen]
 pub struct Matrix2(pub f32, pub f32, pub f32, pub f32);
@@ -20,7 +35,7 @@ impl Matrix2 {
     }
 
     pub fn create() -> Self {
-        Matrix2(1., 0., 1., 0.)
+        Matrix2(1., 0., 0., 1.)
     }
 
     pub fn clone(a: &Matrix2) -> Self {
@@ -90,11 +105,21 @@ impl Matrix2 {
 
     pub fn adjoint(out: &mut Matrix2, a: &Matrix2) {
         // Caching this value is nessecary if out == a
-        let a0 = a.0;
+        if (out as *const Matrix2) == (a as *const Matrix2) {
+            let a = Matrix2::clone(a);
+            out.0 = a.3;
+            out.1 = -a.1;
+            out.2 = -a.2;
+            out.3 = a.0;
+            return;
+        }
+
         out.0 = a.3;
         out.1 = -a.1;
         out.2 = -a.2;
-        out.3 = a0;
+        out.3 = a.0;
+
+        // console_log!("{} {} {} {}", out.0, out.1, out.2, out.3);
     }
 
     pub fn determinant(a: &mut Matrix2) -> f32 {

@@ -12,7 +12,7 @@ export function expect(e) {
             assert.strictEqual(e, a);
         },
         toEqual: function (a) {
-            assert.strictEqual(e, a);
+            Math.abs(e - a) <= EPSILON;
         },
         toBeDefined: function () {
             assert.notStrictEqual(e, undefined);
