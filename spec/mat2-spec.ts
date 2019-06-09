@@ -97,7 +97,6 @@ describe("mat2", function() {
             beforeEach(function() { result = mat2.adjoint(matA, matA); });
 
             it("should place values into matA", function() {
-                console.log(matA.elements);
                 expect(matA).toBeEqualish([4, -2, -3, 1]);
             });
             

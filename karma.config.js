@@ -17,7 +17,7 @@ module.exports = function(config) {
 
     files: [
       // 'spec/**/*-spec.ts'
-      'spec/mat2-spec.ts'
+      'spec/mat3-spec.ts'
     ],
 
     port: 9876,

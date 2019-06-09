@@ -10,8 +10,6 @@ pub static EPSILON: f32 = 0.0001;
 
 pub static PI: f32 = 3.141592653589793;
 
-pub struct OneFloat(pub f32);
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = Math)]
