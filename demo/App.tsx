@@ -24,12 +24,18 @@ export default class App extends React.PureComponent {
     // console.log(v2.elements);
     // console.log(v3.elements);
 
-    const out = (mathJS as any).quat2.create();
-    const quat2A = (mathJS as any).quat2.create();
-    (mathJS as any).quat2.fromRotationTranslation(quat2A, mathJS.quat.fromValues(1,2,3,4), mathJS.vec3.fromValues(-5, 4, 10));
-    (mathJS as any).quat2.normalize(quat2A, quat2A);
-    (mathJS as any).quat2.rotateX(out, quat2A, 5);
-    console.log(out);
+    let matr = mathJS.mat3.create();
+    let m = mathJS.mat4.create();
+    const out = mathJS.quat.create();
+    mathJS.mat4.lookAt(m, mathJS.vec3.fromValues(0, 0, 0), mathJS.vec3.fromValues(-1, 0, 0), mathJS.vec3.fromValues(0, -1, 0));
+    mathJS.mat3.fromMat4(matr, m);
+    mathJS.mat3.invert(matr, matr)
+    mathJS.mat3.transpose(matr, matr);
+    mathJS.quat.fromMat3(out, matr);
+    mathJS.quat.normalize(out, out);
+    let v = mathJS.vec3.create();
+    mathJS.vec3.transformQuat(v, mathJS.vec3.fromValues(3,2,-1), out);
+    console.log(v);
 
     const m1 = math.Matrix4.create();
     const m2 = math.Matrix4.create();

@@ -227,7 +227,7 @@ impl Matrix4 {
         // Calculate the determinant
         let mut det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
-        if (det < EPSILON) {
+        if det.abs() < EPSILON {
             return;
         }
         det = 1.0 / det;
@@ -1083,7 +1083,7 @@ impl Matrix4 {
         out.15 = 0.;
     }
 
-    pub fn perspective(out: &mut Matrix4, fovy: f32, aspect: f32, near: f32, far: f32) {
+    pub fn perspective(out: &mut Matrix4, fovy: f32, aspect: f32, near: f32, far: Option<f32>) {
         let f = 1.0 / f32::tan(fovy / 2.);
         let nf;
         out.0 = f / aspect;
@@ -1100,14 +1100,22 @@ impl Matrix4 {
         out.12 = 0.;
         out.13 = 0.;
         out.15 = 0.;
-        //   if (far != null && far !== f32) {
-        nf = 1. / (near - far);
-        out.10 = (far + near) * nf;
-        out.14 = (2. * far * near) * nf;
-        //   } else {
-        //     out.10 = -1;
-        //     out.14 = -2 * near;
-        //   }
+        match far {
+            Some(far) => {
+                if far == INFINITY || far == NEG_INFINITY {
+                    out.10 = -1.;
+                    out.14 = -2. * near;
+                } else {
+                    nf = 1. / (near - far);
+                    out.10 = (far + near) * nf;
+                    out.14 = (2. * far * near) * nf;
+                }
+            },
+            None => {
+                out.10 = -1.;
+                out.14 = -2. * near;        
+            }
+        };
     }
 
     // pub fn perspectiveFromFieldOfView(out: &mut Matrix4, fov: f32, near: f32, far: f32) {

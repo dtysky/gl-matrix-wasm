@@ -67,7 +67,8 @@ impl Matrix2d {
         let aty = a.5;
 
         let mut det = aa * ad - ab * ac;
-        if (det < EPSILON) {
+
+        if det.abs() < EPSILON {
             return;
         }
         det = 1.0 / det;

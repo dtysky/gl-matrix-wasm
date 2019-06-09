@@ -16,8 +16,8 @@ module.exports = function(config) {
     frameworks: ['mocha'],
 
     files: [
-      // 'spec/**/*-spec.ts'
-      'spec/mat3-spec.ts'
+      'spec/**/*-spec.ts'
+      // 'spec/mat2d-spec.ts'
     ],
 
     port: 9876,

@@ -158,7 +158,7 @@ impl Matrix3 {
         // Calculate the determinant
         let mut det = a00 * b01 + a01 * b11 + a02 * b21;
 
-        if (det < EPSILON) {
+        if det.abs() < EPSILON {
             return;
         }
         det = 1.0 / det;
@@ -438,7 +438,7 @@ impl Matrix3 {
         // Calculate the determinant
         let mut det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
-        if (det < EPSILON) {
+        if det.abs() < EPSILON {
             return;
         }
         det = 1.0 / det;

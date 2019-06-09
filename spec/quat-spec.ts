@@ -156,9 +156,7 @@ describe("quat", function() {
                 quat.normalize(out, out);
                 let v = vec3.create();
                 vec3.transformQuat(v, vec3.fromValues(3,2,-1), out);
-                let v2 = vec3.create();
-                vec3.transformQuat(v2, vec3.fromValues(3,2,-1), matr);
-                expect(v).toBeEqualish(v2);
+                expect(v).toBeEqualish([-3, 2, 1]);
             });
         });
 
@@ -179,10 +177,7 @@ describe("quat", function() {
                 quat.normalize(out, out);
                 let v = vec3.create();
                 vec3.transformQuat(v, vec3.fromValues(3,2,-1), out);
-                let v2 = vec3.create();
-                vec3.transformQuat(v2, vec3.fromValues(3,2,-1), matr);
-                console.log(v.elements);
-                expect(v).toBeEqualish(v2);
+                expect(v).toBeEqualish([-1, -2, 3]);
             });
         });
 
