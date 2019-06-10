@@ -1,7 +1,7 @@
 {
   "name": "gl-matrix-wasm",
   "version": "0.8.0",
-  "description": "Port gl-matrix to webassembly.",
+  "description": "Port gl-matrix to WebAssembly by rust, wasm-bindgen and wasm-pack.",
   "main": "pkg/gl_matrix_wasm.js",
   "types": "pkg/gl_matrix_wasm.d.ts",
   "scripts": {

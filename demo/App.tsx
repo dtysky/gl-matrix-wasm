@@ -8,22 +8,35 @@ import * as React from 'react';
 import * as mathJS from 'gl-matrix';
 import * as benchmark from 'benchmark';
 
-import * as math from 'gl-matrix-wasm';
+// import * as math from 'gl-matrix-wasm';
 
 export default class App extends React.PureComponent {
   private canvas: React.RefObject<HTMLCanvasElement> = React.createRef();
 
   public async componentDidMount() {
-    await math.init();
-    // const math = await import('gl-matrix-wasm/pkg/gl_matrix_wasm.split');
+    // await math.init();
+    const math = await import('gl-matrix-wasm/pkg/gl_matrix_wasm.split');
 
     const v1 = math.Vector4.fromValues(1, 0, 0, 0);
     const v2 = math.Vector4.fromValues(0, 1, 0, 0);
     const v3 = math.Vector4.fromValues(0, 0, 1, 0);
-    // math.Vector4.cross(v3, v1, v2, v3);
-    // console.log(v1.elements);
-    // console.log(v2.elements);
-    // console.log(v3.elements);
+    
+    const v2j = mathJS.vec4.fromValues(0, 1, 0, 0);
+    const v1j = mathJS.vec4.fromValues(1, 0, 0, 0);
+    const v3j = mathJS.vec4.fromValues(0, 0, 1, 0);
+
+    console.log(math.Vector4.add(v1, v2, v3).elements);
+
+    const res = await this.test([
+      {
+        func: () => math.Vector4.add(v1, v2, v3),
+        name: 'WASM'
+      },
+      {
+        func: () => mathJS.vec4.add(v1j, v2j, v3j),
+        name: 'JS'
+      }
+    ]);
 
     const m1 = math.Matrix4.create();
     const m2 = math.Matrix4.create();
@@ -67,16 +80,16 @@ export default class App extends React.PureComponent {
     //   }
     // ]);
 
-    const res = await this.test([
-      {
-        func: () => math.Matrix4.multiply(m3, m1, m2),
-        name: 'WASM'
-      },
-      {
-        func: () => mathJS.mat4.multiply(m1j, m2j, m3j),
-        name: 'JS'
-      }
-    ]);
+    // const res = await this.test([
+    //   {
+    //     func: () => math.Matrix4.multiply(m3, m1, m2),
+    //     name: 'WASM'
+    //   },
+    //   {
+    //     func: () => mathJS.mat4.multiply(m1j, m2j, m3j),
+    //     name: 'JS'
+    //   }
+    // ]);
 
     alert(res);
   }

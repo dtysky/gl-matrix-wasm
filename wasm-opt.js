@@ -29,8 +29,10 @@ wasm.optimize();
 
 const wast = wasm.emitText()
   // .replace(/\(br_if \$label\$1[\s\n]+?\(i32.eq\n[\s\S\n]+?i32.const -1\)[\s\n]+\)[\s\n]+\)/g, '');
-  .replace(/\(br_if \$label\$\d\n\s+\(i32\.eq\n\s+\(tee_local \$\d+?\n\s+\(i32\.load\n\s+\(get_local \$\d\)\n\s+\)\n\s+\)\n\s+\(i32\.const -1\)\n\s+\)\n\s+\)/g, '');
-// fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
+  .replace(/\(br_if \$label\$\d\n\s+\(i32\.eq\n\s+\(tee_local \$\d+?\n\s+\(i32\.load\n\s+\(get_local \$\d\)\n\s+\)\n\s+\)\n\s+\(i32\.const -1\)\n\s+\)\n\s+\)/g, '')
+  .replace(/\(func \$\S+?_elements.+?\(type \$1\) \(param \$0 i32\) \(param \$1 i32\)[\s\S\n]+?\n  \(unreachable\)\n\s*\)/g, '')
+  .replace(/\(export "\S+_elements" \(func \S+\)\)/g, '')
+fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
 
 const distBuffer = binaryen.parseText(wast).emitBinary();
 fs.writeFileSync(fp, distBuffer);
@@ -42,6 +44,13 @@ fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'})
     'export default function init (module_or_path: RequestInfo | BufferSource | WebAssembly.Module): Promise<any>;',
     'export function init (): Promise<any>;'
   )
+  .replace(/(@param {\S+?} out[\s\S\n]+?@returns {void} \n\*\/)\n\s+static (\S+?out[\s\S]+?): void;/g, (_, comm, funh) => {
+    const type = /@param {(\S+)} out/.exec(comm)[1];
+    
+    return `${comm.replace('void', type)}
+    static ${funh}: ${type};
+    `
+  })
 );
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm.js');
 
@@ -68,7 +77,17 @@ const content = fs.readFileSync(fp, {encoding: 'utf8'})
   }`
   )
   .replace('function init(module) {', 'function initModule(module) {')
-  .replace('export default init;', '');
+  .replace('export default init;', '')
+  .replace(/(@param {\S+?} out[\s\S\n]+?@returns {void}\n\s+\*\/)\n\s+static (\S+?\(out[\s\S]+?){\n\s+([\s\S\n]+?)}/g, (_, comm, funh, funb) => {
+    const type = /@param {(\S+)} out/.exec(comm)[1];
+    
+    return `${comm.replace('void', type)}
+    static ${funh} {
+      ${funb.replace('return ', '')}return out;
+    }
+    `
+  });
+
 fs.writeFileSync(fp, header + content + `
 export async function init() {
   return initModule(new Uint8Array([${distBuffer.join(',')}]));
