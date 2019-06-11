@@ -8,6 +8,7 @@
 const binaryen = require("binaryen");
 const path = require('path');
 const fs = require('fs');
+const typescript = require('typescript');
 
 const package = require('./package.json');
 const header = `/** 
@@ -23,16 +24,18 @@ let fp = path.resolve(__dirname, './pkg/gl_matrix_wasm_bg.wasm');
 const originBuffer = fs.readFileSync(fp);
 
 const wasm = binaryen.readBinary(originBuffer);
-binaryen.setOptimizeLevel(0);
-binaryen.setShrinkLevel(0);
+binaryen.setOptimizeLevel(2);
+binaryen.setShrinkLevel(2);
 wasm.optimize();
 
 const wast = wasm.emitText()
-  // .replace(/\(br_if \$label\$1[\s\n]+?\(i32.eq\n[\s\S\n]+?i32.const -1\)[\s\n]+\)[\s\n]+\)/g, '');
+  // remove borrow checking
   .replace(/\(br_if \$label\$\d\n\s+\(i32\.eq\n\s+\(tee_local \$\d+?\n\s+\(i32\.load\n\s+\(get_local \$\d\)\n\s+\)\n\s+\)\n\s+\(i32\.const -1\)\n\s+\)\n\s+\)/g, '')
+  // remove null checking
+  // .replace(/\(br_if \$label\$\d\n\s+\(i32\.eqz[\s\S\n]+?get_local \$\d+?\)\n\s+\)\n\s+\)/g, '')
   .replace(/\(func \$\S+?_elements.+?\(type \$1\) \(param \$0 i32\) \(param \$1 i32\)[\s\S\n]+?\n  \(unreachable\)\n\s*\)/g, '')
   .replace(/\(export "\S+_elements" \(func \S+\)\)/g, '')
-fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
+// fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
 
 const distBuffer = binaryen.parseText(wast).emitBinary();
 fs.writeFileSync(fp, distBuffer);
@@ -70,7 +73,7 @@ const content = fs.readFileSync(fp, {encoding: 'utf8'})
     /get elements\(\) {[\s\S\n]+?}[\s\S\n]+?@returns {(\S+)}/g,
     (_, type) => `get elements() {
       const ptr = this.ptr / 4 + 1;
-      return new Float32Array(wasm.memory.buffer).slice(ptr, ptr + ${offsets[type]});
+      return new Float32Array(wasm.memory.buffer).subarray(ptr, ptr + ${offsets[type]});
     }
     /**
      * @returns {$1}
@@ -88,15 +91,38 @@ const content = fs.readFileSync(fp, {encoding: 'utf8'})
     `
   });
 
-fs.writeFileSync(fp, header + content + `
+const tsconfig = {
+  compilerOptions: {
+    allowJs: true,
+    sourceMap: true,
+    noImplicitAny: false,
+    module: "umd",
+    target: "es5",
+    lib: ["es2017", "dom"],
+    skipLibCheck: true
+  },
+  include: [
+    'pkg/**/*.ts'
+  ]
+};
+
+fs.writeFileSync(fp, typescript.transpileModule(
+  header + content + `
 export async function init() {
   return initModule(new Uint8Array([${distBuffer.join(',')}]));
 }
-  `
-);
+  `,
+  tsconfig
+).outputText);
+
 fs.writeFileSync(
   fp.replace('.js', '.split.js'),
   header + `import * as wasm from './gl_matrix_wasm_bg';` + content.replace('let wasm;', '')
 );
+
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm_bg.d.ts');
 fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'}));
+
+fs.unlinkSync(path.resolve(__dirname, './pkg/package.json'));
+fs.unlinkSync(path.resolve(__dirname, './pkg/.gitignore'));
+fs.unlinkSync(path.resolve(__dirname, './pkg/README.md'));

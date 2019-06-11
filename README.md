@@ -1,28 +1,88 @@
 # gl-matrix-wasm
 
-Port gl-matrix to WebAssembly by rust, wasm-bindgen and wasm-pack.
+Port [gl-matrix](https://github.com/toji/gl-matrix) to WebAssembly by rust, wasm-bindgen and wasm-pack.
 
 ## Goals
 
-1. Complete: Support all functions in gl-matrix.
-2. Pure: Write by pure rust without any third-part dependencies.
-3. Small: 26K(gzip, spilt files) / 34K (gzip, one js file).
-4. Reliable: Full unit tests as same as gl-matrix's.
-5. Fast: Some tricks to speed up the performance in production version.
+1. **Complete**: Support all functions in gl-matrix.
+2. **Pure**: Write by pure rust without any third-part dependencies.
+3. **Small**: 26K(gzip, separate files) / 34K (gzip, wasm buffer will be embedded js file).
+4. **Reliable**: Full unit tests as same as gl-matrix.
+5. **Fast**: Some tricks to speed up the performance in production version.
+
+## Difference
+
+Although this library support all functions in gl-matrix, but there are a little difference:
+
+1. Namespace: this library use `Vector2`, `Matrix4`... as namespace, it is not as same as gl-matrix's `vec2`, `mat4`.
+2. Async: You must initialize this library by async way, it's painful, but wasm requires.
+3. Data storage: When you use some ways such as `const vec2 = Vector2.create();` to create vectors and matrixes, you will get a **Object contains pointer** but not **TypedArray**. This is the largest difference between wasm and js version. In was version, all data are stored in wasm memory, and js side only store those pointers. If you want to get the real value of wasm object, please use `object.elements`, it will return a `Float32Array` that could be pass to GPU, or you can use `object[0]`, `object[1]`... to get each element by index.
+
 
 ## Usage
 
-First, install it
+First, install it:
 
 ```shell
-npm i gl-matrix-wasm -s
+npm i gl-matrix-wasm --save
 ```
 
-### One Js file
+Then you can use two ways to import and use it:
 
-### Split files
+### One JS file
+
+In current time, this way is suggested. It combine wasm file and js wrapper file to one js file(as umd module) which embed a wasm buffer. That means you don't need any external tools, you can use it just as you use **gl-matrix** before.
+
+```ts
+import * as math from 'gl-matrix-wasm';
+
+async function test() {
+  await math.init();
+
+  const vec3 = math.Vector3.create();
+  console.log(vec3.elements);
+}
+```
+
+### Separate files
+
+This way faces the future, it provides a wasm file and a js(es6) file, in js file, it simply import the wasm file. It means you need some tools to compile it to es5 and split wasm file to your final results.
+
+A common toolchain that support wasm is webpack(4.0+), your can put these config to your webpack.config.js file:
+
+```js
+module: {
+  rules: [
+    ......
+    {
+      test: /\.wasm$/,
+      type: 'webassembly/experimental'
+    }
+    ......
+  ]
+}
+```
+
+And you must not exclude **node_modules/gl-matrix** in your js loader.
+
+Now, you can use this library is separate-files mode:
+
+```ts
+async function test() {
+  const math = await import('gl-matrix-wasm/pkg/gl_matrix_wasm.split');
+
+  const v1 = math.Vector4.fromValues(1, 0, 0, 0);
+  console.log(v1[0], v1[1], v1[2], v1[3]);
+}
+```
 
 ## Performance
+
+I did many tests to show how wasm version faster than js. But unfortunately, wasm does not run faster for all scene.
+
+So, for evaluating performance reliably, I made two kinds of tests: benchmark and real-world. 
+
+>PS: In current time, rust & wasm-bindgen version is slower than c++ & emscripten, see [#1585](https://github.com/rustwasm/wasm-bindgen/issues/1585).
 
 ### Benchmark
 
@@ -30,7 +90,11 @@ npm i gl-matrix-wasm -s
 
 Every frame we execute 1000 mul
 
+### CPU & Memory
+
 ## Development
+
+Welcome to contribute, you can run this project in development environment follow this steps:
 
 ### Install RUST
 
@@ -42,4 +106,8 @@ Every frame we execute 1000 mul
 
 ## Next
 
-1. SIMD on WebAssembly.
+SIMD on WebAssembly.
+
+## License
+
+Copyright © 2019, 戴天宇, Tianyu Dai (dtysky < [dtysky@outlook.com](mailto:dtysky@outlook.com) >). All Rights Reserved. This project is free software and released under the [MIT License](https://opensource.org/licenses/MIT).
