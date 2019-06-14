@@ -41,6 +41,9 @@ async function test() {
 
   const vec3 = math.Vector3.create();
   console.log(vec3.elements);
+
+  // don't want to free
+  v1.free();
 }
 ```
 
@@ -73,6 +76,9 @@ async function test() {
 
   const v1 = math.Vector4.fromValues(1, 0, 0, 0);
   console.log(v1[0], v1[1], v1[2], v1[3]);
+
+  // don't want to free
+  v1.free();
 }
 ```
 
