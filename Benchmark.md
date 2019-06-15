@@ -1,4 +1,4 @@
-# Benchmark(Matrix4, 2015 RMBP)
+# Benchmark(Matrix4, 2015 RMBP, Chrome)
 
 multiply(WASM) x 16,854,499 ops/sec ±1.69% (57 runs sampled)  
 multiply(JS) x 11,531,234 ops/sec ±1.68% (57 runs sampled)  

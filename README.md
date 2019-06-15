@@ -9,14 +9,15 @@ Port [gl-matrix](https://github.com/toji/gl-matrix) to WebAssembly by rust, wasm
 3. **Small**: 25K(gzip, separate files) / 32K (gzip, wasm buffer will be embedded js file).
 4. **Reliable**: Full unit tests as same as gl-matrix.
 5. **Fast**: Some tricks to speed up the performance in production version.
+6. **Low cost**: Lower CPU and memory cost than js version.
 
 ## Difference
 
-Although this library support all functions in gl-matrix, but there are a little difference:
+Although this library supports all functions in gl-matrix, but there are a little difference:
 
 1. Namespace: this library use `Vector2`, `Matrix4`... as namespace, it is not as same as gl-matrix's `vec2`, `mat4`.
-2. Async: You must initialize this library by async way, it's painful, but wasm requires.
-3. Data storage: When you use some ways such as `const vec2 = Vector2.create();` to create vectors and matrixes, you will get a **Object contains pointer** but not **TypedArray**. This is the largest difference between wasm and js version. In was version, all data are stored in wasm memory, and js side only store those pointers. If you want to get the real value of wasm object, please use `object.elements`, it will return a `Float32Array` that could be pass to GPU, or you can use `object[0]`, `object[1]`... to get each element by index.
+2. Async: You must initialize this library asynchronous, it is painful, but was wasm required.
+3. Data storage: When you use some ways such as `const vec2 = Vector2.create();` to create vectors and matrixes, you will get a **Object contains pointer** but not **TypedArray**. This is the largest difference between wasm and js version. In wasm version, all data are stored in wasm memory, and in js only store those pointers. If you want to get the real value of wasm object, please use `object.elements`, it will return a `Float32Array` that could be pass to GPU, or you can use `object.elements[0]`, `object.elements[1]`... to get each element by index.
 
 
 ## Usage
@@ -25,6 +26,8 @@ First, install it:
 
 ```shell
 npm i gl-matrix-wasm --save
+
+// or yarn add gl-matrix-wasm
 ```
 
 Then you can use two ways to import and use it:
@@ -37,6 +40,7 @@ In current time, this way is suggested. It combine wasm file and js wrapper file
 import * as math from 'gl-matrix-wasm';
 
 async function test() {
+  // initialize
   await math.init();
 
   const vec3 = math.Vector3.create();
@@ -92,7 +96,7 @@ So, for evaluating performance reliably, I made two kinds of tests: benchmark an
 
 ### Benchmark
 
-See [Benchmark(Matrix4, 2015 RMBP)](./Benchmark.md)
+See [Benchmark(Matrix4, 2015 RMBP, Chrome)](./Benchmark.md)
 
 ### Real World
 
@@ -104,9 +108,11 @@ You can run these tests yourself:
 
 ### CPU & Memory
 
+Waiting...
+
 ## Development
 
-Welcome to contribute, you can run this project in development environment follow this steps:
+Welcome to contribute to this project, you can run this project in development environment follow this steps:
 
 ### Install RUST
 
@@ -136,7 +142,7 @@ npm run dev
 
 #### Develop demo
 
-High performance, but could not be used to debug rust sources.
+High performance, could be used to test the production.
 
 ```sh
 npm run dev-build
@@ -144,7 +150,7 @@ npm run dev-build
 
 ### Unit test
 
-We use karma for testing.
+I use karma for testing.
 
 ```sh
 npm run test
