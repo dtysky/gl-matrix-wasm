@@ -10,6 +10,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 const outPath = path.resolve(__dirname, 'dist');
 
@@ -127,6 +128,13 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './demo/index.html'
+    }),
+    new CompressionPlugin({
+      filename: "[path]",
+      algorithm: "gzip",
+      test: /\.js$|\.css$/,
+      threshold: 10240,
+      minRatio: 0.8
     })
   ]
 };

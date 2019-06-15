@@ -50,6 +50,7 @@
     "awesome-typescript-loader": "^5.2.1",
     "binaryen": "^58.0.0",
     "clean-webpack-plugin": "^0.1.19",
+    "compression-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.0.3",
     "css-loader": "^0.28.8",
     "es6-object-assign": "^1.1.0",
