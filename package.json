@@ -10,7 +10,8 @@
     "build": "wasm-pack build --release --target web && node ./wasm-opt.js",
     "prepublish": "npm run build",
     "test-wsl": "export CHROME_BIN='/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe' && export TEMP='/mnt/c/temp' && karma start karma.config.js",
-    "test": "karma start karma.config.js"
+    "test": "karma start karma.config.js",
+    "dev-build": "export DEV_BUILD=true && npm run build && node server.dev.js"
   },
   "repository": {
     "type": "git",
@@ -40,7 +41,7 @@
   "devDependencies": {
     "@types/benchmark": "^1.0.31",
     "@types/gl-matrix": "^2.4.5",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^5.2.6",
     "@types/node": "^6.0.52",
     "@types/react": "^16.3.13",
     "@types/react-dom": "^16.0.5",

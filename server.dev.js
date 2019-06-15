@@ -20,6 +20,10 @@ app.use('/assets',
   express.static(path.resolve(__dirname, './demo/assets'))
 );
 
+if (process.env.DEV_BUILD) {
+  config.plugins.splice(3, 1);
+}
+
 const devServer = () => {
   const server = new WebpackDevServer(webpack(config), {
     compress: true,

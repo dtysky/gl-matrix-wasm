@@ -6,7 +6,7 @@ Port [gl-matrix](https://github.com/toji/gl-matrix) to WebAssembly by rust, wasm
 
 1. **Complete**: Support all functions in gl-matrix.
 2. **Pure**: Write by pure rust without any third-part dependencies.
-3. **Small**: 26K(gzip, separate files) / 34K (gzip, wasm buffer will be embedded js file).
+3. **Small**: 25K(gzip, separate files) / 32K (gzip, wasm buffer will be embedded js file).
 4. **Reliable**: Full unit tests as same as gl-matrix.
 5. **Fast**: Some tricks to speed up the performance in production version.
 
@@ -75,7 +75,7 @@ async function test() {
   const math = await import('gl-matrix-wasm/pkg/gl_matrix_wasm.split');
 
   const v1 = math.Vector4.fromValues(1, 0, 0, 0);
-  console.log(v1[0], v1[1], v1[2], v1[3]);
+  console.log(vec3.elements);
 
   // don't want to free
   v1.free();
@@ -92,9 +92,15 @@ So, for evaluating performance reliably, I made two kinds of tests: benchmark an
 
 ### Benchmark
 
+See [Benchmark(Matrix4)](./Benchmark.md)
+
 ### Real World
 
-Every frame we execute 1000 mul
+Real world is different from benchmark, I made some tests for each matrix4's method with 10000 calling, and a "really real world" test is also provided, it supposes we will execute operations "Mul x 4 -> fromRTS x 1 -> getElements" 1000 times per frame and run it in 60fps.
+
+You can run these tests yourself:  
+
+[Matrix4 Performance Tests](http://gl-matrix-wasm.dtysky.moe)
 
 ### CPU & Memory
 
@@ -104,11 +110,45 @@ Welcome to contribute, you can run this project in development environment follo
 
 ### Install RUST
 
+```sh
+$ curl https://sh.rustup.rs -sSf | sh
+$ rustup default nightly
+$ rustup target add wasm32-unknown-unknown --toolchain nightly
+$ cargo +nightly install wasm-pack
+$ cargo update
+```
+
 ### Install node packages
+
+```sh
+$ npm i
+```
 
 ### Run
 
+#### Develop rust
+
+Low performance, but could be used to debug rust sources.
+
+```sh
+npm run dev
+```
+
+#### Develop demo
+
+High performance, but could not be used to debug rust sources.
+
+```sh
+npm run dev-build
+```
+
 ### Unit test
+
+We use karma for testing.
+
+```sh
+npm run test
+```
 
 ## Next
 

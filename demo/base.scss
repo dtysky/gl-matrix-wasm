@@ -5,9 +5,24 @@
  * @Description:
  */
 html, body, #container {
-  width: 100%;
-  height: 100%;
   padding: 0;
   margin: 0;
   outline: none;
+}
+
+#container {
+  padding: 2% 10%;
+  width: 80%;
+
+  .test {
+    border-top: 1px solid black;
+
+    &-js {
+      color: red;
+    }
+    
+    &-wasm {
+      color: green;
+    }
+  }
 }

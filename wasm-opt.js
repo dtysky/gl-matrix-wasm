@@ -33,9 +33,12 @@ const wast = wasm.emitText()
   .replace(/\(br_if \$label\$\d\n\s+\(i32\.eq\n\s+\(tee_local \$\d+?\n\s+\(i32\.load\n\s+\(get_local \$\d\)\n\s+\)\n\s+\)\n\s+\(i32\.const -1\)\n\s+\)\n\s+\)/g, '')
   // remove null checking
   // .replace(/\(br_if \$label\$\d\n\s+\(i32\.eqz[\s\S\n]+?get_local \$\d+?\)\n\s+\)\n\s+\)/g, '')
+  // remove getters
+  .replace(/\(export "__wbg_(get|set)_\S+\d+"[\S\s]+?\n/g, '')
+  .replace(/\(func \$__wbg_(set|get)_\S+?_\d+?[ \S]+type \$(6|7)\) \(param \$0 i32\) \((result|param \$1) f32\)\n[\s\S\n]+?\(unreachable\)[\s\S\n]+?\(unreachable\)\n\s+\)/g, '')
   .replace(/\(func \$\S+?_elements.+?\(type \$1\) \(param \$0 i32\) \(param \$1 i32\)[\s\S\n]+?\n  \(unreachable\)\n\s*\)/g, '')
   .replace(/\(export "\S+_elements" \(func \S+\)\)/g, '')
-// fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
+fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
 
 const distBuffer = binaryen.parseText(wast).emitBinary();
 fs.writeFileSync(fp, distBuffer);
@@ -43,6 +46,7 @@ fs.writeFileSync(fp, distBuffer);
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm.d.ts');
 fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'})
   .replace(/get elements\(\)/g, 'readonly elements')
+  .replace(/\d+?: number;\n/g, '')
   .replace(
     'export default function init (module_or_path: RequestInfo | BufferSource | WebAssembly.Module): Promise<any>;',
     'export function init (): Promise<any>;'
@@ -69,16 +73,18 @@ const offsets = {
   Quaternion2: 8
 };
 const content = fs.readFileSync(fp, {encoding: 'utf8'})
-  .replace(
-    /get elements\(\) {[\s\S\n]+?}[\s\S\n]+?@returns {(\S+)}/g,
-    (_, type) => `get elements() {
-      const ptr = this.ptr / 4 + 1;
-      return new Float32Array(wasm.memory.buffer).subarray(ptr, ptr + ${offsets[type]});
-    }
-    /**
-     * @returns {$1}
-  }`
-  )
+  .replace(/static __wrap\(ptr\) {\n[\s\S]+?\.create\((\S+?)\.prototype\);\n\s+obj\.ptr = ptr;\n\n\s+return obj;\n(\s+?)}\n/g, (_, type, indent) => `static __wrap(ptr) {
+${indent}  const obj = Object.create(Matrix4.prototype);
+${indent}  obj.ptr = ptr;
+${indent}  const realPtr = ptr / 4 + 1;
+${indent}  this._elements = new Float32Array(wasm.memory.buffer).subarray(realPtr, realPtr + ${offsets[type]});
+
+${indent}  return obj;
+${indent}}`)
+  .replace(/get elements\(\) {\n[\s\S]+?\n[\s\S]+?\n(\s+)}/g, `get elements() {
+$1    return this._elements;
+$1}`)
+  .replace(/\/\*\*\n\s+?\* @returns {number}\n\s+?\*\/\n\s+?get \d+?\(\) {\n[\s\S]+?\n\s+}\n\s+set \d+?\(arg0\) {\n[\s\S]+?\n\s+?}\n/g, '')
   .replace('function init(module) {', 'function initModule(module) {')
   .replace('export default init;', '')
   .replace(/(@param {\S+?} out[\s\S\n]+?@returns {void}\n\s+\*\/)\n\s+static (\S+?\(out[\s\S]+?){\n\s+([\s\S\n]+?)}/g, (_, comm, funh, funb) => {
@@ -86,7 +92,7 @@ const content = fs.readFileSync(fp, {encoding: 'utf8'})
     
     return `${comm.replace('void', type)}
     static ${funh} {
-      ${funb.replace('return ', '')}return out;
+      ${funb.replace('return ', '')}  return out;
     }
     `
   });
