@@ -9,7 +9,8 @@ Port [gl-matrix](https://github.com/toji/gl-matrix) to WebAssembly by rust, wasm
 3. **Small**: 25K(gzip, separate files) / 32K (gzip, wasm buffer will be embedded js file).
 4. **Reliable**: Full unit tests as same as gl-matrix.
 5. **Fast**: Some tricks to speed up the performance in production version.
-6. **Low cost**: Lower CPU and memory cost than js version.
+6. **LowCost**: Lower CPU and memory cost than js version.
+7. **Controllable**: Predictable memory cost and linear performance(AOT).
 
 ## Difference
 

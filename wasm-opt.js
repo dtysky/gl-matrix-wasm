@@ -38,7 +38,7 @@ const wast = wasm.emitText()
   .replace(/\(func \$__wbg_(set|get)_\S+?_\d+?[ \S]+type \$(6|7)\) \(param \$0 i32\) \((result|param \$1) f32\)\n[\s\S\n]+?\(unreachable\)[\s\S\n]+?\(unreachable\)\n\s+\)/g, '')
   .replace(/\(func \$\S+?_elements.+?\(type \$1\) \(param \$0 i32\) \(param \$1 i32\)[\s\S\n]+?\n  \(unreachable\)\n\s*\)/g, '')
   .replace(/\(export "\S+_elements" \(func \S+\)\)/g, '')
-fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
+// fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
 
 const distBuffer = binaryen.parseText(wast).emitBinary();
 fs.writeFileSync(fp, distBuffer);
