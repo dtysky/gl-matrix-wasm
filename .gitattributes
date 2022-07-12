@@ -32,3 +32,4 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+spec/*.ts linguist-detectable=false
