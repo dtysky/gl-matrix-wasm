@@ -38,7 +38,7 @@ const wast = wasm.emitText()
   .replace(/\(func \$__wbg_(set|get)_\S+?_\d+?[ \S]+type \$(6|7)\) \(param \$0 i32\) \((result|param \$1) f32\)\n[\s\S\n]+?\(unreachable\)[\s\S\n]+?\(unreachable\)\n\s+\)/g, '')
   .replace(/\(func \$\S+?_elements.+?\(type \$1\) \(param \$0 i32\) \(param \$1 i32\)[\s\S\n]+?\n  \(unreachable\)\n\s*\)/g, '')
   .replace(/\(export "\S+_elements" \(func \S+\)\)/g, '')
-fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
+// fs.writeFileSync(fp.replace('.wasm', '.wast'), wast);
 
 const distBuffer = binaryen.parseText(wast).emitBinary();
 fs.writeFileSync(fp, distBuffer);
@@ -48,7 +48,7 @@ fs.writeFileSync(fp, header + fs.readFileSync(fp, {encoding: 'utf8'})
   .replace(/get elements\(\)/g, 'readonly elements')
   .replace(/\d+?: number;\n/g, '')
   .replace(
-    'export default function init (module_or_path: RequestInfo | BufferSource | WebAssembly.Module): Promise<any>;',
+    /export default function init (.+?)\n/,
     'export function init (): Promise<any>;'
   )
   .replace(/(@param {\S+?} out[\s\S\n]+?@returns {void} \n\*\/)\n\s+static (\S+?out[\s\S]+?): void;/g, (_, comm, funh) => {
@@ -74,7 +74,7 @@ const offsets = {
 };
 const content = fs.readFileSync(fp, {encoding: 'utf8'})
   .replace(/static __wrap\(ptr\) {\n[\s\S]+?\.create\((\S+?)\.prototype\);\n\s+obj\.ptr = ptr;\n\n\s+return obj;\n(\s+?)}\n/g, (_, type, indent) => `static __wrap(ptr) {
-${indent}  const obj = Object.create(Matrix4.prototype);
+${indent}  const obj = Object.create(${type}.prototype);
 ${indent}  obj.ptr = ptr;
 ${indent}  const realPtr = ptr / 4 + 1;
 ${indent}  this._elements = new Float32Array(wasm.memory.buffer).subarray(realPtr, realPtr + ${offsets[type]});
@@ -85,7 +85,8 @@ ${indent}}`)
 $1    return this._elements;
 $1}`)
   .replace(/\/\*\*\n\s+?\* @returns {number}\n\s+?\*\/\n\s+?get \d+?\(\) {\n[\s\S]+?\n\s+}\n\s+set \d+?\(arg0\) {\n[\s\S]+?\n\s+?}\n/g, '')
-  .replace('function init(module) {', 'function initModule(module) {')
+  .replace(/\s+if \(typeof input === 'undefined'\) \{\n\s+input = import\.meta\.url\.replace\(\/\\\.js\$\/, '_bg\.wasm'\);\n\s+\}\n/, '')
+  .replace(/function init\((\S+?)\) {/, 'function initModule($1) {')
   .replace('export default init;', '')
   .replace(/(@param {\S+?} out[\s\S\n]+?@returns {void}\n\s+\*\/)\n\s+static (\S+?\(out[\s\S]+?){\n\s+([\s\S\n]+?)}/g, (_, comm, funh, funb) => {
     const type = /@param {(\S+)} out/.exec(comm)[1];
@@ -123,7 +124,11 @@ export async function init() {
 
 fs.writeFileSync(
   fp.replace('.js', '.split.js'),
-  header + `import * as wasm from './gl_matrix_wasm_bg';` + content.replace('let wasm;', '')
+  header + `import * as wasm from './gl_matrix_wasm_bg';` + content.replace('let wasm;', '') + `
+  export async function init() {
+    return initModule(wasm);
+  }
+`
 );
 
 fp = path.resolve(__dirname, './pkg/gl_matrix_wasm_bg.d.ts');
