@@ -175,7 +175,7 @@ impl Vector4 {
         let z = a.2;
         let w = a.3;
         let mut len = x * x + y * y + z * z + w * w;
-        if (len > EPSILON) {
+        if len > EPSILON {
             len = 1. / f32::sqrt(len);
         }
         out.0 = x * len;
@@ -189,7 +189,7 @@ impl Vector4 {
     }
 
     pub fn cross(out: &mut Vector4, u: &Vector4, v: &Vector4, w: &Vector4) {
-        if (out as *const Vector4) == (u as *const Vector4) {
+        if std::ptr::eq(out, u) {
             let v0 = v.0;
             let v1 = v.1;
             let v2 = v.2;

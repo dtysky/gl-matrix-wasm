@@ -43,7 +43,7 @@ impl Quaternion {
     pub fn getAxisAngle(out_axis: &mut Vector3, q: &Quaternion) -> f32 {
         let rad = f32::acos(q.3) * 2.0;
         let s = f32::sin(rad / 2.0);
-        if (s > EPSILON) {
+        if s > EPSILON {
             out_axis.0 = q.0 / s;
             out_axis.1 = q.1 / s;
             out_axis.2 = q.2 / s;
@@ -252,7 +252,7 @@ impl Quaternion {
         // article "Quaternion Calculus and Fast Animation".
         let fTrace = m.0 + m.4 + m.8;
 
-        if (fTrace > 0.0) {
+        if fTrace > 0.0 {
             // |w| > 1/2, may as well choose w > 1/2
             let mut fRoot = f32::sqrt(fTrace + 1.0); // 2w
             out.3 = 0.5 * fRoot;
@@ -263,11 +263,11 @@ impl Quaternion {
         } else {
             // |w| <= 1/2
             let mut i = 0;
-            if (m.4 > m.0) {
+            if m.4 > m.0 {
                 i = 1;
             }
             let tmp = if i == 0 { m.0 } else { m.4 };
-            if (m.8 > tmp) {
+            if m.8 > tmp {
                 i = 2;
             }
 
@@ -408,7 +408,7 @@ impl Quaternion {
         let z = a.2;
         let w = a.3;
         let mut len = x * x + y * y + z * z + w * w;
-        if (len > EPSILON) {
+        if len > EPSILON {
             len = 1. / f32::sqrt(len);
         }
         out.0 = x * len;
@@ -442,14 +442,14 @@ impl Quaternion {
         let yUnitVec3 = &Vector3::fromValues(0., 1., 0.);
 
         let dot = Vector3::dot(a, b);
-        if (dot < -0.999999) {
+        if dot < -0.999999 {
             Vector3::cross(tmpvec3, xUnitVec3, a);
-            if (Vector3::len(tmpvec3) < EPSILON) {
+            if Vector3::len(tmpvec3) < EPSILON {
                 Vector3::cross(tmpvec3, yUnitVec3, a);
             }
             Vector3::normalize(tmpvec3, &Vector3::clone(tmpvec3));
             Quaternion::setAxisAngle(out, tmpvec3, PI);
-        } else if (dot > 0.999999) {
+        } else if dot > 0.999999 {
             out.0 = 0.;
             out.1 = 0.;
             out.2 = 0.;

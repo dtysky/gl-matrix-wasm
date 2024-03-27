@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 
 pub static EPSILON: f32 = 0.0001;
 
-pub static PI: f32 = 3.141592653589793;
+pub static PI: f32 = std::f32::consts::PI;
 
 pub static INFINITY: f32 = 1.0_f32 / 0.0_f32;
 

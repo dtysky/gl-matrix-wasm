@@ -117,7 +117,7 @@ impl Matrix3 {
 
     pub fn transpose(out: &mut Matrix3, a: &Matrix3) {
         // If we are transposing ourselves we can skip a few steps but have to cache some values
-        if (out as *const Matrix3) == (a as *const Matrix3) {
+        if std::ptr::eq(out, a) {
             let a01 = a.1;
             let a02 = a.2;
             let a12 = a.5;
@@ -185,15 +185,15 @@ impl Matrix3 {
         let a21 = a.7;
         let a22 = a.8;
 
-        out.0 = (a11 * a22 - a12 * a21);
-        out.1 = (a02 * a21 - a01 * a22);
-        out.2 = (a01 * a12 - a02 * a11);
-        out.3 = (a12 * a20 - a10 * a22);
-        out.4 = (a00 * a22 - a02 * a20);
-        out.5 = (a02 * a10 - a00 * a12);
-        out.6 = (a10 * a21 - a11 * a20);
-        out.7 = (a01 * a20 - a00 * a21);
-        out.8 = (a00 * a11 - a01 * a10);
+        out.0 = a11 * a22 - a12 * a21;
+        out.1 = a02 * a21 - a01 * a22;
+        out.2 = a01 * a12 - a02 * a11;
+        out.3 = a12 * a20 - a10 * a22;
+        out.4 = a00 * a22 - a02 * a20;
+        out.5 = a02 * a10 - a00 * a12;
+        out.6 = a10 * a21 - a11 * a20;
+        out.7 = a01 * a20 - a00 * a21;
+        out.8 = a00 * a11 - a01 * a10;
     }
 
     pub fn determinant(a: &Matrix3) -> f32 {

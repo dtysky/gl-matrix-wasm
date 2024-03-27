@@ -153,7 +153,7 @@ impl Matrix4 {
 
     pub fn transpose(out: &mut Matrix4, a: &Matrix4) {
         // If we are transposing ourselves we can skip a few steps but have to cache some values
-        if (out as *const Matrix4) == (a as *const Matrix4) {
+        if std::ptr::eq(out, a) {
             let a01 = a.1;
             let a02 = a.2;
             let a03 = a.3;
@@ -268,38 +268,38 @@ impl Matrix4 {
         let a32 = a.14;
         let a33 = a.15;
 
-        out.0 = (a11 * (a22 * a33 - a23 * a32) - a21 * (a12 * a33 - a13 * a32)
-            + a31 * (a12 * a23 - a13 * a22));
+        out.0 = a11 * (a22 * a33 - a23 * a32) - a21 * (a12 * a33 - a13 * a32)
+            + a31 * (a12 * a23 - a13 * a22);
         out.1 = -(a01 * (a22 * a33 - a23 * a32) - a21 * (a02 * a33 - a03 * a32)
             + a31 * (a02 * a23 - a03 * a22));
-        out.2 = (a01 * (a12 * a33 - a13 * a32) - a11 * (a02 * a33 - a03 * a32)
-            + a31 * (a02 * a13 - a03 * a12));
+        out.2 = a01 * (a12 * a33 - a13 * a32) - a11 * (a02 * a33 - a03 * a32)
+            + a31 * (a02 * a13 - a03 * a12);
         out.3 = -(a01 * (a12 * a23 - a13 * a22) - a11 * (a02 * a23 - a03 * a22)
             + a21 * (a02 * a13 - a03 * a12));
         out.4 = -(a10 * (a22 * a33 - a23 * a32) - a20 * (a12 * a33 - a13 * a32)
             + a30 * (a12 * a23 - a13 * a22));
-        out.5 = (a00 * (a22 * a33 - a23 * a32) - a20 * (a02 * a33 - a03 * a32)
-            + a30 * (a02 * a23 - a03 * a22));
+        out.5 = a00 * (a22 * a33 - a23 * a32) - a20 * (a02 * a33 - a03 * a32)
+            + a30 * (a02 * a23 - a03 * a22);
         out.6 = -(a00 * (a12 * a33 - a13 * a32) - a10 * (a02 * a33 - a03 * a32)
             + a30 * (a02 * a13 - a03 * a12));
-        out.7 = (a00 * (a12 * a23 - a13 * a22) - a10 * (a02 * a23 - a03 * a22)
-            + a20 * (a02 * a13 - a03 * a12));
-        out.8 = (a10 * (a21 * a33 - a23 * a31) - a20 * (a11 * a33 - a13 * a31)
-            + a30 * (a11 * a23 - a13 * a21));
+        out.7 = a00 * (a12 * a23 - a13 * a22) - a10 * (a02 * a23 - a03 * a22)
+            + a20 * (a02 * a13 - a03 * a12);
+        out.8 = a10 * (a21 * a33 - a23 * a31) - a20 * (a11 * a33 - a13 * a31)
+            + a30 * (a11 * a23 - a13 * a21);
         out.9 = -(a00 * (a21 * a33 - a23 * a31) - a20 * (a01 * a33 - a03 * a31)
             + a30 * (a01 * a23 - a03 * a21));
-        out.10 = (a00 * (a11 * a33 - a13 * a31) - a10 * (a01 * a33 - a03 * a31)
-            + a30 * (a01 * a13 - a03 * a11));
+        out.10 = a00 * (a11 * a33 - a13 * a31) - a10 * (a01 * a33 - a03 * a31)
+            + a30 * (a01 * a13 - a03 * a11);
         out.11 = -(a00 * (a11 * a23 - a13 * a21) - a10 * (a01 * a23 - a03 * a21)
             + a20 * (a01 * a13 - a03 * a11));
         out.12 = -(a10 * (a21 * a32 - a22 * a31) - a20 * (a11 * a32 - a12 * a31)
             + a30 * (a11 * a22 - a12 * a21));
-        out.13 = (a00 * (a21 * a32 - a22 * a31) - a20 * (a01 * a32 - a02 * a31)
-            + a30 * (a01 * a22 - a02 * a21));
+        out.13 = a00 * (a21 * a32 - a22 * a31) - a20 * (a01 * a32 - a02 * a31)
+            + a30 * (a01 * a22 - a02 * a21);
         out.14 = -(a00 * (a11 * a32 - a12 * a31) - a10 * (a01 * a32 - a02 * a31)
             + a30 * (a01 * a12 - a02 * a11));
-        out.15 = (a00 * (a11 * a22 - a12 * a21) - a10 * (a01 * a22 - a02 * a21)
-            + a20 * (a01 * a12 - a02 * a11));
+        out.15 = a00 * (a11 * a22 - a12 * a21) - a10 * (a01 * a22 - a02 * a21)
+            + a20 * (a01 * a12 - a02 * a11);
     }
 
     pub fn determinant(a: &Matrix4) -> f32 {
@@ -398,7 +398,7 @@ impl Matrix4 {
         let y = v.1;
         let z = v.2;
 
-        if (out as *const Matrix4) == (a as *const Matrix4) {
+        if std::ptr::eq(out, a) {
             out.12 = a.0 * x + a.4 * y + a.8 * z + a.12;
             out.13 = a.1 * x + a.5 * y + a.9 * z + a.13;
             out.14 = a.2 * x + a.6 * y + a.10 * z + a.14;
@@ -464,7 +464,7 @@ impl Matrix4 {
         let mut x = axis.0;
         let mut y = axis.1;
         let mut z = axis.2;
-        let mut len = (x.powi(2) + y.powi(2) + z.powi(2)).sqrt();
+        let len = (x.powi(2) + y.powi(2) + z.powi(2)).sqrt();
 
         if len < EPSILON {
             return;
@@ -669,7 +669,7 @@ impl Matrix4 {
         let mut z = axis.2;
         let mut len = (x.powi(2) + y.powi(2) + z.powi(2)).sqrt();
 
-        if (len < EPSILON) {
+        if len < EPSILON {
             return;
         }
 
@@ -821,7 +821,7 @@ impl Matrix4 {
 
         let magnitude = bx * bx + by * by + bz * bz + bw * bw;
         //Only scale if it makes sense
-        if (magnitude > EPSILON) {
+        if magnitude > EPSILON {
             translation.0 = (ax * bw + aw * bx + ay * bz - az * by) * 2. / magnitude;
             translation.1 = (ay * bw + aw * by + az * bx - ax * bz) * 2. / magnitude;
             translation.2 = (az * bw + aw * bz + ax * by - ay * bx) * 2. / magnitude;
@@ -878,19 +878,19 @@ impl Matrix4 {
 
         let trace = sm11 + sm22 + sm33;
 
-        if (trace > 0.) {
+        if trace > 0. {
             let S = f32::sqrt(trace + 1.0) * 2.;
             out.3 = 0.25 * S;
             out.0 = (sm23 - sm32) / S;
             out.1 = (sm31 - sm13) / S;
             out.2 = (sm12 - sm21) / S;
-        } else if ((sm11 > sm22) && (sm11 > sm33)) {
+        } else if (sm11 > sm22) && (sm11 > sm33) {
             let S = f32::sqrt(1.0 + sm11 - sm22 - sm33) * 2.;
             out.3 = (sm23 - sm32) / S;
             out.0 = 0.25 * S;
             out.1 = (sm12 + sm21) / S;
             out.2 = (sm31 + sm13) / S;
-        } else if (sm22 > sm33) {
+        } else if sm22 > sm33 {
             let S = f32::sqrt(1.0 + sm22 - sm11 - sm33) * 2.;
             out.3 = (sm31 - sm13) / S;
             out.0 = (sm12 + sm21) / S;
@@ -1185,9 +1185,9 @@ impl Matrix4 {
         let centery = center.1;
         let centerz = center.2;
 
-        if (f32::abs(eyex - centerx) < EPSILON
+        if f32::abs(eyex - centerx) < EPSILON
             && f32::abs(eyey - centery) < EPSILON
-            && f32::abs(eyez - centerz) < EPSILON)
+            && f32::abs(eyez - centerz) < EPSILON
         {
             Matrix4::identity(out);
             return;
@@ -1197,7 +1197,7 @@ impl Matrix4 {
         let mut z1 = eyey - centery;
         let mut z2 = eyez - centerz;
 
-        let mut len = 1. / (z0.powi(2) + z1.powi(2) + z2.powi(2)).sqrt();
+        let len = 1. / (z0.powi(2) + z1.powi(2) + z2.powi(2)).sqrt();
         z0 *= len;
         z1 *= len;
         z2 *= len;
@@ -1206,7 +1206,7 @@ impl Matrix4 {
         let mut x1 = upz * z0 - upx * z2;
         let mut x2 = upx * z1 - upy * z0;
         let mut len = (x0.powi(2) + x1.powi(2) + x2.powi(2)).sqrt();
-        if (len < EPSILON) {
+        if len < EPSILON {
             x0 = 0.;
             x1 = 0.;
             x2 = 0.;
@@ -1222,7 +1222,7 @@ impl Matrix4 {
         let mut y2 = z0 * x1 - z1 * x0;
 
         len = (y0.powi(2) + y1.powi(2) + y2.powi(2)).sqrt();
-        if (len < EPSILON) {
+        if len < EPSILON {
             y0 = 0.;
             y1 = 0.;
             y2 = 0.;
@@ -1264,7 +1264,7 @@ impl Matrix4 {
         let mut z2 = eyez - target.2;
 
         let mut len = z0 * z0 + z1 * z1 + z2 * z2;
-        if (len > EPSILON) {
+        if len > EPSILON {
             len = 1. / f32::sqrt(len);
             z0 *= len;
             z1 *= len;
@@ -1276,7 +1276,7 @@ impl Matrix4 {
         let mut x2 = upx * z1 - upy * z0;
 
         len = x0 * x0 + x1 * x1 + x2 * x2;
-        if (len > EPSILON) {
+        if len > EPSILON {
             len = 1. / f32::sqrt(len);
             x0 *= len;
             x1 *= len;
