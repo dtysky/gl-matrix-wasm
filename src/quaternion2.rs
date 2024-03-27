@@ -372,7 +372,7 @@ impl Quaternion2 {
 
     pub fn rotateAroundAxis(out: &mut Quaternion2, a: &Quaternion2, axis: &Vector3, rad: f32) {
         //Special case for rad = 0
-        if (f32::abs(rad) < EPSILON) {
+        if f32::abs(rad) < EPSILON {
             Quaternion2::copy(out, a);
             return;
         }
@@ -470,7 +470,7 @@ impl Quaternion2 {
     pub fn lerp(out: &mut Quaternion2, a: &Quaternion2, b: &Quaternion2, t: f32) {
         let mt = 1. - t;
         let mut t = t;
-        if (Quaternion2::dot(a, b) < EPSILON) {
+        if Quaternion2::dot(a, b) < EPSILON {
             t = -t;
         }
 
@@ -529,7 +529,7 @@ impl Quaternion2 {
 
     pub fn normalize(out: &mut Quaternion2, a: &Quaternion2) {
         let mut magnitude = Quaternion2::squaredLength(a);
-        if (magnitude > EPSILON) {
+        if magnitude > EPSILON {
             magnitude = f32::sqrt(magnitude);
 
             let a0 = a.0 / magnitude;

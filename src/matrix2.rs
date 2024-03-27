@@ -55,7 +55,7 @@ impl Matrix2 {
     pub fn transpose(out: &mut Matrix2, a: &Matrix2) {
         // If we are transposing ourselves we can skip a few steps but have to cache
         // some values
-        if (out as *const Matrix2) == (a as *const Matrix2) {
+        if std::ptr::eq(out, a) {
             let a1 = a.1;
             out.1 = a.2;
             out.2 = a1;
@@ -90,7 +90,7 @@ impl Matrix2 {
 
     pub fn adjoint(out: &mut Matrix2, a: &Matrix2) {
         // Caching this value is nessecary if out == a
-        if (out as *const Matrix2) == (a as *const Matrix2) {
+        if std::ptr::eq(out, a) {
             let a = Matrix2::clone(a);
             out.0 = a.3;
             out.1 = -a.1;
@@ -176,7 +176,7 @@ impl Matrix2 {
         (a.0.powi(2) + a.1.powi(2) + a.2.powi(2) + a.3.powi(2)).sqrt()
     }
 
-    pub fn LDU(L: &mut Matrix2, D: &mut Matrix2, U: &mut Matrix2, a: &Matrix2) {
+    pub fn LDU(L: &mut Matrix2, _D: &mut Matrix2, U: &mut Matrix2, a: &Matrix2) {
         L.2 = a.2 / a.0;
         U.0 = a.0;
         U.1 = a.1;
@@ -198,7 +198,7 @@ impl Matrix2 {
     }
 
     pub fn exactEquals(a: &Matrix2, b: &Matrix2) -> bool {
-        return a.0 == b.0 && a.1 == b.1 && a.2 == b.2 && a.3 == b.3;
+        a.0 == b.0 && a.1 == b.1 && a.2 == b.2 && a.3 == b.3
     }
 
     pub fn equals(a: &Matrix2, b: &Matrix2) -> bool {

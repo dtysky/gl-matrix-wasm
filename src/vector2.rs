@@ -138,7 +138,7 @@ impl Vector2 {
         let x = a.0;
         let y = a.1;
         let mut len = x * x + y * y;
-        if (len > EPSILON) {
+        if len > EPSILON {
             //TODO: evaluate use of glm_invsqrt here?
             len = 1. / f32::sqrt(len);
         }
@@ -223,22 +223,22 @@ impl Vector2 {
         let y2 = b.1;
 
         let mut len1 = x1 * x1 + y1 * y1;
-        if (len1 > EPSILON) {
+        if len1 > EPSILON {
             //TODO: evaluate use of glm_invsqrt here?
             len1 = 1. / f32::sqrt(len1);
         }
 
         let mut len2 = x2 * x2 + y2 * y2;
-        if (len2 > EPSILON) {
+        if len2 > EPSILON {
             //TODO: evaluate use of glm_invsqrt here?
             len2 = 1. / f32::sqrt(len2);
         }
 
         let cosine = (x1 * x2 + y1 * y2) * len1 * len2;
 
-        if (cosine > 1.0) {
+        if cosine > 1.0 {
             0.
-        } else if (cosine < -1.0) {
+        } else if cosine < -1.0 {
             PI
         } else {
             f32::acos(cosine)

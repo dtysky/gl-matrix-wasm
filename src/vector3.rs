@@ -166,11 +166,11 @@ impl Vector3 {
     }
 
     pub fn dot(a: &Vector3, b: &Vector3) -> f32 {
-        return a.0 * b.0 + a.1 * b.1 + a.2 * b.2;
+        a.0 * b.0 + a.1 * b.1 + a.2 * b.2
     }
 
     pub fn cross(out: &mut Vector3, a: &Vector3, b: &Vector3) {
-        if (out as *const Vector3) == (a as *const Vector3) {
+        if std::ptr::eq(out, a) {
             let ax = out.0;
             let ay = out.1;
             let az = out.2;
@@ -184,7 +184,7 @@ impl Vector3 {
             return;
         }
 
-        if (out as *const Vector3) == (b as *const Vector3) {
+        if std::ptr::eq(out, b) {
             let ax = a.0;
             let ay = a.1;
             let az = a.2;
@@ -380,9 +380,9 @@ impl Vector3 {
 
         let cosine = Vector3::dot(tempA, tempB);
 
-        if (cosine > 1.0) {
+        if cosine > 1.0 {
             0.
-        } else if (cosine < -1.0) {
+        } else if cosine < -1.0 {
             PI
         } else {
             f32::acos(cosine)
